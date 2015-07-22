@@ -2,6 +2,8 @@ package filebrowser;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
@@ -37,6 +39,7 @@ public class FileOpenAction extends Action implements IWorkbenchAction {
 		return instance;
 	}
 
+	@Inject
 	public void run() {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		String path = page.getSelection().toString();

@@ -19,9 +19,7 @@ import org.eclipse.ui.part.ViewPart;
 
 @SuppressWarnings("restriction")
 public class BrowserView extends ViewPart {
-	public BrowserView() {
-	}
-
+	
 	private TreeViewer treeViewer;
 	private Tree tree;
 	public static final String ID = "FileBrowser.browserView";
@@ -39,6 +37,10 @@ public class BrowserView extends ViewPart {
 			System.out.println(sdf.format(dt).toString() +  " " + path);
 		}
 	};
+	
+	public BrowserView() {
+	}
+	
 
 	@Override
 	public void createPartControl(Composite parent) {

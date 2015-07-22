@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_ZwrqgDAlEeWYnrXTzVGLzw" elementId="org.eclipse.e4.ide.application" bindingContexts="_ZwrqiTAlEeWYnrXTzVGLzw">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_ZwrqgTAlEeWYnrXTzVGLzw" label="FileBrowser_E4" width="500" height="400">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_ZwrqgTAlEeWYnrXTzVGLzw" selectedElement="_ZwsRkDAlEeWYnrXTzVGLzw" label="FileBrowser_E4" width="1280" height="720">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_ZwsRkDAlEeWYnrXTzVGLzw">
       <children xsi:type="advanced:Perspective" xmi:id="_ZwsRkTAlEeWYnrXTzVGLzw">
-        <children xsi:type="basic:PartSashContainer" xmi:id="_ZwsRkjAlEeWYnrXTzVGLzw">
-          <children xsi:type="basic:PartStack" xmi:id="_ZwsRkzAlEeWYnrXTzVGLzw">
-            <children xsi:type="basic:Part" xmi:id="_ZwsRlDAlEeWYnrXTzVGLzw" contributionURI="bundleclass://FileBrowser_E4/FileBrowser_E4.parts.SamplePart" label="Sample Part"/>
+        <children xsi:type="basic:PartSashContainer" xmi:id="_tK8_8DAnEeWYnrXTzVGLzw" elementId="" horizontal="true">
+          <children xsi:type="basic:PartStack" xmi:id="_vzNboDAnEeWYnrXTzVGLzw" elementId="filebrowser_e4.partstack.0" containerData="2">
+            <children xsi:type="advanced:Placeholder" xmi:id="_xfLOMDAnEeWYnrXTzVGLzw" elementId="Browser" ref="_vLoTsDAmEeWYnrXTzVGLzw"/>
+          </children>
+          <children xsi:type="basic:PartSashContainer" xmi:id="_uxccoDAnEeWYnrXTzVGLzw" elementId="" containerData="8">
+            <children xsi:type="advanced:Placeholder" xmi:id="_5N83wDAnEeWYnrXTzVGLzw" elementId="org.eclipse.ui.editorss" containerData="7" ref="_AQVVYDAoEeWYnrXTzVGLzw"/>
+            <children xsi:type="basic:PartStack" xmi:id="_6LZXcDAnEeWYnrXTzVGLzw" elementId="filebrowser_e4.partstack.1" containerData="3">
+              <children xsi:type="advanced:Placeholder" xmi:id="_SSKjIDAoEeWYnrXTzVGLzw" elementId="org.eclipse.ui.console.ConsoleView" ref="_XkDI8DAnEeWYnrXTzVGLzw"/>
+            </children>
           </children>
         </children>
       </children>
@@ -20,6 +26,18 @@
         <children xsi:type="menu:HandledMenuItem" xmi:id="_ZwrqnzAlEeWYnrXTzVGLzw" label="About" command="_ZwrqljAlEeWYnrXTzVGLzw"/>
       </children>
     </mainMenu>
+    <sharedElements xsi:type="basic:Part" xmi:id="_vLoTsDAmEeWYnrXTzVGLzw" elementId="filebrowser.browserView" contributionURI="bundleclass://FileBrowser/filebrowser.BrowserView" label="Browser" iconURI="platform:/plugin/FileBrowser/icons/folder.png"/>
+    <sharedElements xsi:type="basic:Part" xmi:id="_XkDI8DAnEeWYnrXTzVGLzw" elementId="org.eclipse.ui.console.ConsoleView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Console" iconURI="platform:/plugin/org.eclipse.ui.console/$nl$/icons/full/cview16/console_view.png" closeable="true">
+      <tags>View</tags>
+      <tags>categoryTag:org.eclipse.ui</tags>
+      <menus xmi:id="_XkDI8TAnEeWYnrXTzVGLzw" elementId="org.eclipse.ui.console.ConsoleView">
+        <tags>ViewMenu</tags>
+      </menus>
+      <toolbar xmi:id="_XkDI8jAnEeWYnrXTzVGLzw" elementId="org.eclipse.ui.console.ConsoleView"/>
+    </sharedElements>
+    <sharedElements xsi:type="advanced:Area" xmi:id="_AQVVYDAoEeWYnrXTzVGLzw" elementId="org.eclipse.ui.editorss">
+      <children xsi:type="basic:PartStack" xmi:id="_Btq2EDAoEeWYnrXTzVGLzw" elementId="org.eclipse.e4.primaryDataStack"/>
+    </sharedElements>
     <trimBars xmi:id="_ZwsRlTAlEeWYnrXTzVGLzw">
       <children xsi:type="menu:ToolBar" xmi:id="_ZwsRljAlEeWYnrXTzVGLzw" elementId="toolbar:org.eclipse.ui.main.toolbar">
         <children xsi:type="menu:HandledToolItem" xmi:id="_ZwsRlzAlEeWYnrXTzVGLzw" iconURI="platform:/plugin/FileBrowser_E4/icons/sample.png" command="_ZwrqkDAlEeWYnrXTzVGLzw"/>
