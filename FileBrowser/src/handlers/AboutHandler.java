@@ -1,4 +1,4 @@
-package filebrowser;
+package handlers;
 
 import java.net.URL;
 
@@ -13,6 +13,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
+
+import utils.FileTreeLabelProvider;
 
 public class AboutHandler extends AbstractHandler{
 

@@ -10,6 +10,10 @@ import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
+import views.BrowserView;
+import views.PathView;
+import views.GraphView;
+
 public class Perspective implements IPerspectiveFactory {
 
 	public void createInitialLayout(IPageLayout layout) {
@@ -19,6 +23,7 @@ public class Perspective implements IPerspectiveFactory {
 		setConsole();
 		layout.addStandaloneView(IConsoleConstants.ID_CONSOLE_VIEW, true, IPageLayout.BOTTOM, 0.8f,IPageLayout.ID_EDITOR_AREA);
 		layout.addView("FileBrowser.outlineView", IPageLayout.RIGHT, 0.8f, IPageLayout.ID_EDITOR_AREA);
+		//layout.addStandaloneView(GraphView.ID, true, IPageLayout.BOTTOM, 0.7f, IPageLayout.ID_EDITOR_AREA);
 	}
 	
 	public void setConsole(){

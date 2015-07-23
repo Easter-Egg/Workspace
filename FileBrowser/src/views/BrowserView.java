@@ -1,4 +1,4 @@
-package filebrowser;
+package views;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -16,6 +16,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.part.ViewPart;
+
+import utils.FileOpenAction;
+import utils.FileTreeContentProvider;
+import utils.FileTreeLabelProvider;
 
 @SuppressWarnings("restriction")
 public class BrowserView extends ViewPart {

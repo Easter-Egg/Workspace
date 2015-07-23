@@ -1,4 +1,4 @@
-package filebrowser;
+package handlers;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -22,6 +22,10 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
+
+import editors.ImageEditor;
+import editors.MyTextEditor;
+import views.OutlineView;
 
 public class FileOpenHandler extends AbstractHandler {
 

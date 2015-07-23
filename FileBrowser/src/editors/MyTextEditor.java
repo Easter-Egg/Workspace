@@ -1,4 +1,4 @@
-package filebrowser;
+package editors;
 
 import java.io.BufferedReader;
 import java.io.File;

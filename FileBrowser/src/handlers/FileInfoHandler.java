@@ -1,4 +1,4 @@
-package filebrowser;
+package handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -7,6 +7,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+
+import editors.ImageEditor;
 
 public class FileInfoHandler extends AbstractHandler {
 

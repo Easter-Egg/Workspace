@@ -1,4 +1,4 @@
-package filebrowser;
+package handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

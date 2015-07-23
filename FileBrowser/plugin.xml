@@ -22,44 +22,56 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="true"
-            class="filebrowser.BrowserView"
+            class="views.BrowserView"
             id="FileBrowser.browserView"
             name="Browser"
             restorable="true">
       </view>
       <view
-            class="filebrowser.PathView"
+            class="views.PathView"
             id="FileBrowser.pathView"
             name="Path"
             restorable="true">
       </view>
       <view
-            class="filebrowser.OutlineView"
+            class="views.OutlineView"
             id="FileBrowser.outlineView"
             name="Outline"
+            restorable="true">
+      </view>
+      <view
+            class="views.GraphView"
+            id="FileBrowser.graphView"
+            name="Graph"
             restorable="true">
       </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="filebrowser.MyTextEditor"
+            class="editors.MyTextEditor"
             default="false"
             extensions="txt"
             id="FileBrowser.MyTextEditor"
             name="MyTextEditor">
       </editor>
       <editor
-            class="filebrowser.ImageEditor"
+            class="editors.ImageEditor"
             default="false"
             id="FileBrowser.ImageEditor"
             name="ImageEditor">
+      </editor>
+      <editor
+            class="editors.GraphEditor"
+            default="false"
+            id="FileBrowser.graphEditor"
+            name="GraphView">
       </editor>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="filebrowser.ExitHandler"
+            defaultHandler="handlers.ExitHandler"
             id="FileBrowser.command.Exit"
             name="Exit">
       </command>
@@ -68,22 +80,22 @@
             name="About">
       </command>
       <command
-            defaultHandler="filebrowser.ExpandHandler"
+            defaultHandler="handlers.ExpandHandler"
             id="FileBrowser.Expand"
             name="Expand">
       </command>
       <command
-            defaultHandler="filebrowser.CollapseHandler"
+            defaultHandler="handlers.CollapseHandler"
             id="FileBrowser.CollapseAll"
             name="CollapseAll">
       </command>
       <command
-            defaultHandler="filebrowser.FileOpenHandler"
+            defaultHandler="handlers.FileOpenHandler"
             id="FileBrowser.fileOpen"
             name="Open File">
       </command>
       <command
-            defaultHandler="filebrowser.FileInfoHandler"
+            defaultHandler="handlers.FileInfoHandler"
             id="FileBrowser.command.FileInfo"
             name="File Info">
       </command>
@@ -226,17 +238,37 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="filebrowser.AboutHandler"
+            class="handlers.AboutHandler"
             commandId="FileBrowser.command.About">
          <enabledWhen>
             <with
                   variable="activePart">
                <instanceof
-                     value="filebrowser.BrowserView">
+                     value="views.BrowserView">
                </instanceof>
             </with>
          </enabledWhen> 
       </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="FileBrowser.perspective">
+         <view
+               id="FileBrowser.graphView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.editorss"
+               visible="false">
+         </view>
+         <view
+               id="FileBrowser.graphView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.editorss"
+               visible="false">
+         </view>
+      </perspectiveExtension>
    </extension>
 
 </plugin>

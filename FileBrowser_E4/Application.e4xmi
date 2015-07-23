@@ -26,7 +26,7 @@
         <children xsi:type="menu:HandledMenuItem" xmi:id="_ZwrqnzAlEeWYnrXTzVGLzw" label="About" command="_ZwrqljAlEeWYnrXTzVGLzw"/>
       </children>
     </mainMenu>
-    <sharedElements xsi:type="basic:Part" xmi:id="_vLoTsDAmEeWYnrXTzVGLzw" elementId="filebrowser.browserView" contributionURI="bundleclass://FileBrowser/filebrowser.BrowserView" label="Browser" iconURI="platform:/plugin/FileBrowser/icons/folder.png"/>
+    <sharedElements xsi:type="basic:Part" xmi:id="_vLoTsDAmEeWYnrXTzVGLzw" elementId="filebrowser.browserView" contributionURI="bundleclass://FileBrowser/views.BrowserView" label="Browser" iconURI="platform:/plugin/FileBrowser/icons/folder.png"/>
     <sharedElements xsi:type="basic:Part" xmi:id="_XkDI8DAnEeWYnrXTzVGLzw" elementId="org.eclipse.ui.console.ConsoleView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Console" iconURI="platform:/plugin/org.eclipse.ui.console/$nl$/icons/full/cview16/console_view.png" closeable="true">
       <tags>View</tags>
       <tags>categoryTag:org.eclipse.ui</tags>

@@ -1,4 +1,4 @@
-package filebrowser;
+package views;
 
 import java.io.File;
 
@@ -10,6 +10,9 @@ import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
+
+import editors.ImageEditor;
+import editors.MyTextEditor;
 
 public class OutlineView extends PageBookView {
 	public OutlineView() {
