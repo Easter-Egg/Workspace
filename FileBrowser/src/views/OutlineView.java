@@ -2,6 +2,8 @@ package views;
 
 import java.io.File;
 
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -10,7 +12,8 @@ import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
-import org.eclipse.zest.core.widgets.Graph;
+import org.eclipse.zest.core.widgets.GraphConnection;
+import org.eclipse.zest.core.widgets.GraphNode;
 
 import editors.GraphEditor;
 import editors.ImageEditor;
@@ -22,11 +25,12 @@ public class OutlineView extends PageBookView {
 	public static final String ID = "FileBrowser.outlineView";
 	private IEditorInput ei;
 	private FileStoreEditorInput fsei;
+	private MessagePage messagePage;
 
 	@Override
 	protected IPage createDefaultPage(PageBook book) {
 		// TODO Auto-generated method stub
-		MessagePage messagePage = new MessagePage();
+		messagePage = new MessagePage();
 		initPage(messagePage);
 		messagePage.setMessage("");
 		messagePage.createControl(book);
@@ -35,7 +39,7 @@ public class OutlineView extends PageBookView {
 
 	@Override
 	protected PageRec doCreatePage(IWorkbenchPart part) {
-		MessagePage messagePage = new MessagePage();
+		messagePage = new MessagePage();
 		initPage(messagePage);
 		
 		ei = ((IEditorPart) part).getEditorInput();
@@ -43,6 +47,30 @@ public class OutlineView extends PageBookView {
 		File file = new File(fsei.getURI().getPath());
 		
 		if(part instanceof GraphEditor){
+			GraphEditor ge = (GraphEditor) part;
+			ge.getGraph().addSelectionListener(new SelectionListener() {
+				
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					if(e.item instanceof GraphNode){
+						GraphNode selectedNode = (GraphNode) e.item;
+						if(!selectedNode.getTargetConnections().isEmpty()){
+							GraphConnection gc = (GraphConnection) selectedNode.getTargetConnections().get(0);
+							GraphNode srcOfSelectedNode = (GraphNode) gc.getSource();
+							messagePage.setMessage("파일명 : " + selectedNode.getText() + "\n상위폴더 : " + srcOfSelectedNode.getText());
+						}
+						else {
+							messagePage.setMessage("파일명 : " + selectedNode.getText() + "\n상위폴더 : " + file.getParent());
+						}
+					}
+				}
+				
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
 			messagePage.setMessage("파일명 : " + file.getName() + "\n상위폴더 : " + file.getParent());
 			messagePage.createControl(getPageBook());
 			return new PageRec(part, messagePage);
@@ -77,4 +105,7 @@ public class OutlineView extends PageBookView {
 	     partActivated(part);
 	}
 
+	public MessagePage getMessagePage(){
+		return messagePage;
+	}
 }

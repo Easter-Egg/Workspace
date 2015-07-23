@@ -57,7 +57,6 @@ public class FileOpenAction extends Action implements IWorkbenchAction {
 
 		try {
 			if (file.isDirectory()) {
-				
 				page.openEditor(fileStoreEditorInput, GraphEditor.ID, false);
 				
 				if(tv.getExpandedState(file))

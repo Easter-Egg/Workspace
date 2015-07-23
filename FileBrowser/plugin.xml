@@ -97,6 +97,11 @@
             id="FileBrowser.command.fileCopy"
             name="Copy">
       </command>
+      <command
+            defaultHandler="handlers.ChangeLayoutStyleHandler"
+            id="FileBrowser.command.changeLayout"
+            name="Change Layout">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -207,6 +212,15 @@
                commandId="FileBrowser.command.FileInfo"
                icon="icons/zoomin.png"
                label="File Info"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:FileBrowser.graphEditor">
+         <command
+               commandId="FileBrowser.command.changeLayout"
+               icon="icons/File.ico"
                style="push">
          </command>
       </menuContribution>
