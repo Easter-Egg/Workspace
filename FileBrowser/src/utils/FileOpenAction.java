@@ -19,10 +19,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
+import editors.GraphEditor;
 import editors.ImageEditor;
 import editors.MyTextEditor;
 import views.BrowserView;
-import views.GraphView;
 
 public class FileOpenAction extends Action implements IWorkbenchAction {
 
@@ -57,6 +57,9 @@ public class FileOpenAction extends Action implements IWorkbenchAction {
 
 		try {
 			if (file.isDirectory()) {
+				
+				page.openEditor(fileStoreEditorInput, GraphEditor.ID, false);
+				
 				if(tv.getExpandedState(file))
 					tv.setExpandedState(file, false);
 				
@@ -72,11 +75,6 @@ public class FileOpenAction extends Action implements IWorkbenchAction {
 
 			else if ((file.getName().endsWith(".jpg") || file.getName().endsWith(".png"))) {
 				page.openEditor(fileStoreEditorInput, ImageEditor.ID, false);
-			}
-			
-			else{
-				System.out.println("open view!");
-				page.showView(GraphView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 			}
 			
 		} catch (PartInitException e) {

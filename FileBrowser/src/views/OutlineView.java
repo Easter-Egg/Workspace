@@ -10,7 +10,9 @@ import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
+import org.eclipse.zest.core.widgets.Graph;
 
+import editors.GraphEditor;
 import editors.ImageEditor;
 import editors.MyTextEditor;
 
@@ -36,14 +38,21 @@ public class OutlineView extends PageBookView {
 		MessagePage messagePage = new MessagePage();
 		initPage(messagePage);
 		
-		if(part instanceof IEditorPart){
-			ei = ((IEditorPart) part).getEditorInput();
-			fsei = (FileStoreEditorInput) ei;
-		}
+		ei = ((IEditorPart) part).getEditorInput();
+		fsei = (FileStoreEditorInput) ei;
 		File file = new File(fsei.getURI().getPath());
-		messagePage.setMessage("파일명 : " + file.getName() + "\n파일크기 : " + file.length() + " Bytes");
-		messagePage.createControl(getPageBook());
-		return new PageRec(part, messagePage);
+		
+		if(part instanceof GraphEditor){
+			messagePage.setMessage("파일명 : " + file.getName() + "\n상위폴더 : " + file.getParent());
+			messagePage.createControl(getPageBook());
+			return new PageRec(part, messagePage);
+		}
+		
+		else{
+			messagePage.setMessage("파일명 : " + file.getName() + "\n파일크기 : " + file.length() + " Bytes");
+			messagePage.createControl(getPageBook());
+			return new PageRec(part, messagePage);
+		}
 	}
 
 	@Override
@@ -61,7 +70,7 @@ public class OutlineView extends PageBookView {
 	protected boolean isImportant(IWorkbenchPart part) {
 		// TODO Auto-generated method stub
 		
-		return (part instanceof MyTextEditor || part instanceof ImageEditor);
+		return (part instanceof MyTextEditor || part instanceof ImageEditor || part instanceof GraphEditor);
 	}
 	
 	public void partBroughtToTop(IWorkbenchPart part) {

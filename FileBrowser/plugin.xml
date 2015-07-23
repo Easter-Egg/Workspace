@@ -39,12 +39,6 @@
             name="Outline"
             restorable="true">
       </view>
-      <view
-            class="views.GraphView"
-            id="FileBrowser.graphView"
-            name="Graph"
-            restorable="true">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -249,26 +243,6 @@
             </with>
          </enabledWhen> 
       </handler>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="FileBrowser.perspective">
-         <view
-               id="FileBrowser.graphView"
-               minimized="false"
-               relationship="stack"
-               relative="org.eclipse.ui.editorss"
-               visible="false">
-         </view>
-         <view
-               id="FileBrowser.graphView"
-               minimized="false"
-               relationship="stack"
-               relative="org.eclipse.ui.editorss"
-               visible="false">
-         </view>
-      </perspectiveExtension>
    </extension>
 
 </plugin>

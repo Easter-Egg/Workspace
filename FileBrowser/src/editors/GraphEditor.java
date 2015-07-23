@@ -1,14 +1,21 @@
 package editors;
 
+import java.io.File;
+import java.net.URI;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.EditorPart;
+import org.eclipse.zest.core.viewers.GraphViewer;
 import org.eclipse.zest.core.widgets.Graph;
 import org.eclipse.zest.core.widgets.GraphConnection;
 import org.eclipse.zest.core.widgets.GraphNode;
@@ -16,25 +23,50 @@ import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.layouts.LayoutStyles;
 import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
 
+@SuppressWarnings("unused")
 public class GraphEditor extends EditorPart {
 	public GraphEditor() {
 	}
 	public static final String ID = "FileBrowser.graphEditor";
 	private Graph graph;
+	
+	private GraphConnection conn;
+	private GraphConnection childConn;
 	private GraphConnection conn1;
 	private GraphConnection conn2;
 	private GraphConnection conn3;
 	private GraphConnection conn4;
+	
+	private SelectionListener selectionListener = new SelectionListener(){
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println(e.item);
+			//((GraphNode) e.item).
+		}
+
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	};
 
 	static class NewGraphNode extends GraphNode {
 		public NewGraphNode(Graph graph, int none, String string) {
 			super(graph, none, string);
 			setSize(100, 60);
 		}
-
 	}
+	
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(Composite parent) {		
+		
+		FileStoreEditorInput fsInput = (FileStoreEditorInput)getEditorInput();
+		URI uri = fsInput.getURI();
+		File file = new File(uri);
 		
 		graph = new Graph(parent, SWT.NONE);
 		//graph resize > redraw
@@ -42,51 +74,26 @@ public class GraphEditor extends EditorPart {
 
 			@Override
 			public void handleEvent(Event event) {
-				System.out.println("graph Resizing");
 				graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 				
 			}
 			
 		});
-		@SuppressWarnings("unused")
-		GraphNode node1 = new NewGraphNode(graph, SWT.NONE, "Node 1");
-		GraphNode node2 = new NewGraphNode(graph, SWT.NONE, "Node 2");
-		GraphNode node3 = new NewGraphNode(graph, SWT.NONE, "Node 3");
-		GraphNode node4 = new NewGraphNode(graph, SWT.NONE, "Node 4");
-		GraphNode node5 = new NewGraphNode(graph, SWT.NONE, "Node 5");
 		
-		conn1 = new GraphConnection(graph, ZestStyles.CONNECTIONS_SOLID, node2, node3);
-		conn2 = new GraphConnection(graph, ZestStyles.CONNECTIONS_SOLID, node2, node4);
-		conn3 = new GraphConnection(graph, ZestStyles.CONNECTIONS_SOLID, node3, node5);
-		conn4 = new GraphConnection(graph, SWT.NONE, node4, node5);
-	
-		//change Connection style
-		conn1.setText("redLine");
-		conn2.setHighlightColor(parent.getDisplay().getSystemColor(SWT.COLOR_GREEN));
-		conn3.setLineWidth(4);
-		conn1.changeLineColor(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
-		// Manhattan Connection 
-		/*FanRouter f = new FanRouter(); 
-		ManhattanConnectionRouter m = new ManhattanConnectionRouter(); 
-			
-		conn1.getConnectionFigure().setConnectionRouter(f); 
-		f.route(conn1.getConnectionFigure()); 
-		f.setNextRouter(m); 
+		GraphNode root = new NewGraphNode(graph, SWT.NONE, file.getName());
 		
-		conn2.getConnectionFigure().setConnectionRouter(f); 
-		f.route(conn2.getConnectionFigure()); 
-		f.setNextRouter(m); 
-
-		conn3.getConnectionFigure().setConnectionRouter(f); 
-		f.route(conn3.getConnectionFigure()); 
-		f.setNextRouter(m); 
-			
-		conn4.getConnectionFigure().setConnectionRouter(f); 
-		f.route(conn4.getConnectionFigure()); 
-		f.setNextRouter(m); */
-		
+		for(File childFile : file.listFiles()){
+			GraphNode childNode = new NewGraphNode(graph, SWT.NONE, childFile.getName());
+			conn = new GraphConnection(graph, ZestStyles.CONNECTIONS_SOLID, root, childNode);
+			if(childFile.isDirectory()){
+				for(File grandChildFile : childFile.listFiles()){
+					GraphNode grandChildeNode = new NewGraphNode(graph, SWT.NONE, grandChildFile.getName());
+					childConn = new GraphConnection(graph, ZestStyles.CONNECTIONS_SOLID, childNode, grandChildeNode);
+				}
+			}
+		}		
 		graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
-		
+		graph.addSelectionListener(selectionListener);
 	}
 
 	@Override
@@ -126,7 +133,7 @@ public class GraphEditor extends EditorPart {
 		// TODO Auto-generated method stub
 		setSite(site);
 		setInput(input);
-		setPartName("GRAPH");
+		setPartName(input.getName());
 	}
 
 	@Override
