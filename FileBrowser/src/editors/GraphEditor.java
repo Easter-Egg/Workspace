@@ -10,6 +10,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -21,14 +23,12 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.EditorPart;
-import org.eclipse.ui.part.ViewPart;
 import org.eclipse.zest.core.widgets.Graph;
 import org.eclipse.zest.core.widgets.GraphConnection;
 import org.eclipse.zest.core.widgets.GraphNode;
@@ -39,6 +39,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 import utils.FileTreeLabelProvider;
+import views.TestOutlineView;
 
 @SuppressWarnings("unused")
 public class GraphEditor extends EditorPart {
@@ -76,6 +77,7 @@ public class GraphEditor extends EditorPart {
 		url = FileLocator.find(bundle, new Path("icons/File.ico"), null);
 		imageDcr = ImageDescriptor.createFromURL(url);
 		Image fileImage = imageDcr.createImage();
+		
 		
 		FileStoreEditorInput fsInput = (FileStoreEditorInput)getEditorInput();
 		URI uri = fsInput.getURI();
@@ -122,10 +124,52 @@ public class GraphEditor extends EditorPart {
 			}		
 		}
 		graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		graph.addFocusListener(new FocusListener(){
+			@Override
+			public void focusGained(FocusEvent e) {
+				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
+				olv.getText().setText("Folder Name : " + file.getName() + "\nParent Folder : " + file.getParent());
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+			}
+		});
+		graph.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				if(e.item instanceof GraphNode){
+					GraphNode selectedNode = (GraphNode) e.item;
+					TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
+					
+					if(!selectedNode.getTargetConnections().isEmpty()){
+						GraphConnection gc = (GraphConnection) selectedNode.getTargetConnections().get(0);
+						GraphNode srcOfSelectedNode = (GraphNode) gc.getSource();
+						olv.getText().setText("파일명 : " + selectedNode.getText() + "\n상위폴더 : " + srcOfSelectedNode.getText());
+					}
+					else{
+						olv.getText().setText("파일명 : " + selectedNode.getText() + "\n상위폴더 : " + file.getParent());
+					}
+				}
+				
+				else {
+					// do Nothing
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 	}
 
 	@Override
 	public void setFocus() {
+		graph.setFocus();
 	}
 	
 	public Graph getGraph(){

@@ -2,8 +2,6 @@ package views;
 
 import java.io.File;
 
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -12,8 +10,6 @@ import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
-import org.eclipse.zest.core.widgets.GraphConnection;
-import org.eclipse.zest.core.widgets.GraphNode;
 
 import editors.GraphEditor;
 import editors.ImageEditor;
@@ -47,31 +43,7 @@ public class OutlineView extends PageBookView {
 		File file = new File(fsei.getURI().getPath());
 		
 		if(part instanceof GraphEditor){
-			GraphEditor ge = (GraphEditor) part;
-			ge.getGraph().addSelectionListener(new SelectionListener() {
-				
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					if(e.item instanceof GraphNode){
-						GraphNode selectedNode = (GraphNode) e.item;
-						if(!selectedNode.getTargetConnections().isEmpty()){
-							GraphConnection gc = (GraphConnection) selectedNode.getTargetConnections().get(0);
-							GraphNode srcOfSelectedNode = (GraphNode) gc.getSource();
-							messagePage.setMessage("파일명 : " + selectedNode.getText() + "\n상위폴더 : " + srcOfSelectedNode.getText());
-						}
-						else {
-							messagePage.setMessage("파일명 : " + selectedNode.getText() + "\n상위폴더 : " + file.getParent());
-						}
-					}
-				}
-				
-				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {
-					// TODO Auto-generated method stub
-					
-				}
-			});
-			messagePage.setMessage("파일명 : " + file.getName() + "\n상위폴더 : " + file.getParent());
+			messagePage.setMessage("Folder is opened with Graph Editor");
 			messagePage.createControl(getPageBook());
 			return new PageRec(part, messagePage);
 		}

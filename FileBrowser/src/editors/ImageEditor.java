@@ -6,6 +6,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -21,10 +23,14 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.EditorPart;
+
+import views.TestOutlineView;
 
 public class ImageEditor extends EditorPart{
 	public static final String ID = "FileBrowser.ImageEditor";
@@ -72,6 +78,8 @@ public class ImageEditor extends EditorPart{
 		ToolBarManager tm = new ToolBarManager(toolbar);
 		this.tm = tm;		
 		((IMenuService) getEditorSite().getService(IMenuService.class)).populateContributionManager(tm, "toolbar:FileBrowser.ImageEditor");
+		
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
 		IEditorInput editorInput = getEditorInput();
 		FileStoreEditorInput fsInput = (FileStoreEditorInput)editorInput;
@@ -155,6 +163,17 @@ public class ImageEditor extends EditorPart{
 			}
 		});
 		
+		canvas.addFocusListener(new FocusListener(){
+			@Override
+			public void focusGained(FocusEvent e) {
+				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
+				olv.getText().setText("File Name : " + file.getName() + "\nFile Size : " + file.length() + " Bytes");
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+			}
+		});
+		
 		MenuManager menuManager = new MenuManager();
 		Menu menu = menuManager.createContextMenu(canvas);
 		canvas.setMenu(menu);
@@ -168,7 +187,7 @@ public class ImageEditor extends EditorPart{
 
 	@Override
 	public void setFocus() {
-		
+		canvas.setFocus();
 	}
 	
 	public Image getImage(){

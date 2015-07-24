@@ -12,7 +12,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.StatusLineContributionItem;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -57,7 +57,7 @@ public class FileOpenAction extends Action implements IWorkbenchAction {
 
 		try {
 			if (file.isDirectory()) {
-				page.openEditor(fileStoreEditorInput, GraphEditor.ID, false);
+				page.openEditor(fileStoreEditorInput, GraphEditor.ID, false).setFocus();
 				
 				if(tv.getExpandedState(file))
 					tv.setExpandedState(file, false);
@@ -68,24 +68,24 @@ public class FileOpenAction extends Action implements IWorkbenchAction {
 			}
 			
 			else if (file.getName().endsWith(".txt")) {
-				page.openEditor(fileStoreEditorInput, MyTextEditor.ID, false);
+				page.openEditor(fileStoreEditorInput, MyTextEditor.ID, false).setFocus();
 			
 			}
 
 			else if ((file.getName().endsWith(".jpg") || file.getName().endsWith(".png"))) {
-				page.openEditor(fileStoreEditorInput, ImageEditor.ID, false);
+				page.openEditor(fileStoreEditorInput, ImageEditor.ID, false).setFocus();
 			}
 			
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
-		
+		/*
 		if(!file.isDirectory()){
-			IActionBars bars = ((IViewSite) page.getActivePart().getSite()).getActionBars();
+			IActionBars bars = ((IEditorSite) page.getActivePart().getSite()).getActionBars();
 			bars.getStatusLineManager().setMessage(file.getName() + " is opened.");
 			StatusLineContributionItem statusBars = ((StatusLineContributionItem) bars.getStatusLineManager().find("Size"));
 			statusBars.setText(file.length() + " Bytes");
-		}
+		}*/
 	}
 
 	@Override
