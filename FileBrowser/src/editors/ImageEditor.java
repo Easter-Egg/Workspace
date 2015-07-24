@@ -38,8 +38,9 @@ public class ImageEditor extends EditorPart{
 	public ScrollBar vBar = null;
 	public Point origin = new Point (0, 0);
 	public ToolBarManager tm;
-	public Image image;
+	private Image image;
 	public Canvas canvas;
+	private IWorkbenchPage page;
 	
 	public ImageEditor() {
 	}
@@ -79,7 +80,7 @@ public class ImageEditor extends EditorPart{
 		this.tm = tm;		
 		((IMenuService) getEditorSite().getService(IMenuService.class)).populateContributionManager(tm, "toolbar:FileBrowser.ImageEditor");
 		
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
 		IEditorInput editorInput = getEditorInput();
 		FileStoreEditorInput fsInput = (FileStoreEditorInput)editorInput;
@@ -168,6 +169,9 @@ public class ImageEditor extends EditorPart{
 			public void focusGained(FocusEvent e) {
 				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
 				olv.getText().setText("File Name : " + file.getName() + "\nFile Size : " + file.length() + " Bytes");
+				olv.getCanvas().setVisible(true);
+				olv.setImage(image);
+				olv.getCanvas().redraw();
 			}
 			@Override
 			public void focusLost(FocusEvent e) {

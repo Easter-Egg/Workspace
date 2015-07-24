@@ -33,12 +33,11 @@ public class BrowserView extends ViewPart {
 		@Override
 		public void doubleClick(DoubleClickEvent event) {
 			String path = event.getSelection().toString();
-			FileOpenAction foa = FileOpenAction.getInstance();
-			foa.run();
-			
 			Date dt = new Date();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, hh:mm:ss:SSS a"); 
 			System.out.println(sdf.format(dt).toString() +  " " + path);
+			FileOpenAction foa = FileOpenAction.getInstance();
+			foa.run();
 		}
 	};
 	

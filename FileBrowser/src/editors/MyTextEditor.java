@@ -32,13 +32,13 @@ import org.eclipse.ui.part.EditorPart;
 
 import views.TestOutlineView;
 
-@SuppressWarnings("unused")
 public class MyTextEditor extends EditorPart {
 	public static final String ID = "FileBrowser.MyTextEditor";
 	private TextViewer textViewer;
 	private int firstLineLength = -1;
 	private String fileName = null;
 	private String fileSize = null;
+	private IWorkbenchPage page;
 
 	public MyTextEditor() {
 		// TODO Auto-generated constructor stub
@@ -75,7 +75,6 @@ public class MyTextEditor extends EditorPart {
 		return false;
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public void createPartControl(Composite parent) {
 		GridLayout layout = new GridLayout(1, false);
@@ -87,7 +86,7 @@ public class MyTextEditor extends EditorPart {
 		IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
 		menuService.populateContributionManager(toolbarman, "toolbar:FileBrowser.MyTextEditor");
 		
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		
 		textViewer = new TextViewer(parent, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.None);
 		textViewer.getTextWidget().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -109,6 +108,7 @@ public class MyTextEditor extends EditorPart {
 			public void focusGained(FocusEvent e) {
 				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
 				olv.getText().setText("File Name : " + fileName + "\nFile Size : " + fileSize);
+				olv.getCanvas().setVisible(false);
 			}
 			@Override
 			public void focusLost(FocusEvent e) {
@@ -142,5 +142,4 @@ public class MyTextEditor extends EditorPart {
 	public void setFocus() {
 		textViewer.getControl().setFocus();
 	}
-
 }

@@ -34,15 +34,15 @@
             restorable="true">
       </view>
       <view
-            class="views.OutlineView"
-            id="FileBrowser.outlineView"
+            class="views.TestOutlineView"
+            id="FileBrowser.testOutlineView"
             name="Outline"
             restorable="true">
       </view>
       <view
-            class="views.TestOutlineView"
-            id="FileBrowser.testOutlineView"
-            name="Outline"
+            class="views.ThumbNailView"
+            id="FileBrowser.thumbNailView"
+            name="ThumbNail"
             restorable="true">
       </view>
    </extension>

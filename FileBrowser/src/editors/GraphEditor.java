@@ -59,6 +59,8 @@ public class GraphEditor extends EditorPart {
 	private GraphConnection conn3;
 	private GraphConnection conn4;
 	
+	private GraphNode root;
+	
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new GridLayout(1, false));
@@ -92,23 +94,26 @@ public class GraphEditor extends EditorPart {
 			}
 		});
 		
-		GraphNode root = new GraphNode(graph, SWT.NONE, file.getName(), folderImage);
+		if(file.getParent() == null){
+			root = new GraphNode(graph, SWT.NONE, file.toString(), folderImage);
+			setPartName(file.toString());
+		}
+		else {
+			root = new GraphNode(graph, SWT.NONE, file.getName(), folderImage);
+		}
 		
 		if(file.listFiles().length != 0){
 			for(File childFile : file.listFiles()){
 				if(childFile.isDirectory()){
-					// Æú´õ ³ëµå »ý¼º
 					GraphNode childNode = new GraphNode(graph, SWT.NONE, childFile.getName(), folderImage);
 					conn = new GraphConnection(graph, ZestStyles.CONNECTIONS_SOLID, root, childNode);
 					if(childFile.listFiles() != null){
 						for(File grandChildFile : childFile.listFiles()){
 							if(grandChildFile.isDirectory()){
-								// Æú´õ ³ëµå »ý¼º
 								GraphNode grandChildNode = new GraphNode(graph, SWT.NONE, grandChildFile.getName(), folderImage);
 								childConn = new GraphConnection(graph, ZestStyles.CONNECTIONS_SOLID, childNode, grandChildNode);
 							}
 							else {
-								//ÆÄÀÏ ³ëµå »ý¼º
 								GraphNode grandChildNode = new GraphNode(graph, SWT.NONE, grandChildFile.getName(), fileImage);
 								childConn = new GraphConnection(graph, ZestStyles.CONNECTIONS_SOLID, childNode, grandChildNode);
 							}
@@ -117,18 +122,27 @@ public class GraphEditor extends EditorPart {
 				}
 				
 				else {
-					// ÆÄÀÏ ³ëµå »ý¼º
 					GraphNode childNode = new GraphNode(graph, SWT.NONE, childFile.getName(), fileImage);
 					conn = new GraphConnection(graph, ZestStyles.CONNECTIONS_SOLID, root, childNode);
 				}
 			}		
 		}
+		
+		else {
+			// do Nothing
+		}
+		
 		graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 		graph.addFocusListener(new FocusListener(){
 			@Override
 			public void focusGained(FocusEvent e) {
 				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
-				olv.getText().setText("Folder Name : " + file.getName() + "\nParent Folder : " + file.getParent());
+				
+				if(file.getParent() == null)
+					olv.getText().setText("Folder Name : " + file.toString());
+				
+				else
+					olv.getText().setText("Folder Name : " + file.getName() + "\nParent Folder : " + file.getParent());
 			}
 			@Override
 			public void focusLost(FocusEvent e) {
@@ -146,10 +160,10 @@ public class GraphEditor extends EditorPart {
 					if(!selectedNode.getTargetConnections().isEmpty()){
 						GraphConnection gc = (GraphConnection) selectedNode.getTargetConnections().get(0);
 						GraphNode srcOfSelectedNode = (GraphNode) gc.getSource();
-						olv.getText().setText("ÆÄÀÏ¸í : " + selectedNode.getText() + "\n»óÀ§Æú´õ : " + srcOfSelectedNode.getText());
+						olv.getText().setText("ï¿½ï¿½ï¿½Ï¸ï¿½ : " + selectedNode.getText() + "\nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ : " + srcOfSelectedNode.getText());
 					}
 					else{
-						olv.getText().setText("ÆÄÀÏ¸í : " + selectedNode.getText() + "\n»óÀ§Æú´õ : " + file.getParent());
+						olv.getText().setText("ï¿½ï¿½ï¿½Ï¸ï¿½ : " + selectedNode.getText() + "\nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ : " + file.getParent());
 					}
 				}
 				
@@ -190,19 +204,16 @@ public class GraphEditor extends EditorPart {
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void doSaveAs() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		// TODO Auto-generated method stub
 		setSite(site);
 		setInput(input);
 		setPartName(input.getName());
@@ -210,13 +221,11 @@ public class GraphEditor extends EditorPart {
 
 	@Override
 	public boolean isDirty() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isSaveAsAllowed() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }
