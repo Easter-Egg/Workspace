@@ -3,23 +3,15 @@ package handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.draw2d.ConnectionRouter;
-import org.eclipse.draw2d.FanRouter;
-import org.eclipse.draw2d.ManhattanConnectionRouter;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.zest.core.widgets.GraphConnection;
-
-import editors.GraphEditor;
-import utils.NullConnectionRouter;
 
 public class ChangeConnectionStyleHandler extends AbstractHandler{
 	int ConnectionState = 1;
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		return event;
 		
-		
+		/*
 		FanRouter f = new FanRouter(); 
 		ManhattanConnectionRouter m = new ManhattanConnectionRouter();
 		
@@ -73,7 +65,7 @@ public class ChangeConnectionStyleHandler extends AbstractHandler{
 			ConnectionState -= 1;
 		}
 		
-		return null;
+		return null;*/
 	
 	}
 }

@@ -108,10 +108,10 @@ public class MyTextEditor extends EditorPart {
 			public void focusGained(FocusEvent e) {
 				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
 				olv.getText().setText("File Name : " + fileName + "\nFile Size : " + fileSize);
-				olv.getCanvas().setVisible(false);
 			}
 			@Override
 			public void focusLost(FocusEvent e) {
+				
 			}
 		});
 	}

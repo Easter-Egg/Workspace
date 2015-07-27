@@ -143,6 +143,7 @@ public class ImageEditor extends EditorPart{
 				}
 			}
 		});
+		
 		hBar.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
@@ -169,9 +170,6 @@ public class ImageEditor extends EditorPart{
 			public void focusGained(FocusEvent e) {
 				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
 				olv.getText().setText("File Name : " + file.getName() + "\nFile Size : " + file.length() + " Bytes");
-				olv.getCanvas().setVisible(true);
-				olv.setImage(image);
-				olv.getCanvas().redraw();
 			}
 			@Override
 			public void focusLost(FocusEvent e) {

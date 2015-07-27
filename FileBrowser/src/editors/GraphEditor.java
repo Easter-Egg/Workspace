@@ -7,6 +7,7 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.draw2d.Viewport;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -53,12 +54,6 @@ public class GraphEditor extends EditorPart {
 	public ToolBarManager tm;
 
 	private IWorkbenchPage page;
-	
-	private GraphConnection conn1;
-	private GraphConnection conn2;
-	private GraphConnection conn3;
-	private GraphConnection conn4;
-	
 	private GraphNode root;
 	
 	@Override
@@ -136,18 +131,23 @@ public class GraphEditor extends EditorPart {
 		graph.addFocusListener(new FocusListener(){
 			@Override
 			public void focusGained(FocusEvent e) {
+
 				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
-				
 				if(file.getParent() == null)
 					olv.getText().setText("Folder Name : " + file.toString());
 				
 				else
 					olv.getText().setText("Folder Name : " + file.getName() + "\nParent Folder : " + file.getParent());
+				
+				olv.getThumbNail().redraw();
 			}
+			
 			@Override
 			public void focusLost(FocusEvent e) {
+				
 			}
 		});
+		
 		graph.addSelectionListener(new SelectionListener(){
 
 			@Override
@@ -160,10 +160,10 @@ public class GraphEditor extends EditorPart {
 					if(!selectedNode.getTargetConnections().isEmpty()){
 						GraphConnection gc = (GraphConnection) selectedNode.getTargetConnections().get(0);
 						GraphNode srcOfSelectedNode = (GraphNode) gc.getSource();
-						olv.getText().setText("���ϸ� : " + selectedNode.getText() + "\n�������� : " + srcOfSelectedNode.getText());
+						olv.getText().setText("폴더명 : " + selectedNode.getText() + "\n상위폴더 : " + srcOfSelectedNode.getText());
 					}
 					else{
-						olv.getText().setText("���ϸ� : " + selectedNode.getText() + "\n�������� : " + file.getParent());
+						olv.getText().setText("폴더명 : " + selectedNode.getText() + "\n상위폴더 : " + file.getParent());
 					}
 				}
 				
@@ -188,18 +188,6 @@ public class GraphEditor extends EditorPart {
 	
 	public Graph getGraph(){
 		return graph;
-	}
-	public GraphConnection getConn1(){
-		return conn1;
-	}
-	public GraphConnection getConn2(){
-		return conn2;
-	}
-	public GraphConnection getConn3(){
-		return conn3;
-	}
-	public GraphConnection getConn4(){
-		return conn4;
 	}
 
 	@Override
