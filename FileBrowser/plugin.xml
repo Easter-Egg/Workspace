@@ -42,7 +42,7 @@
       <view
             class="views.ThumbNailView"
             id="FileBrowser.thumbNailView"
-            name="ThumbNail"
+            name="Thumbnail"
             restorable="true">
       </view>
    </extension>

@@ -42,6 +42,7 @@ public class BrowserView extends ViewPart {
 	};
 	
 	public BrowserView() {
+		
 	}
 	
 

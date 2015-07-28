@@ -1,23 +1,28 @@
 package views;
 
-import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.draw2d.LightweightSystem;
+import org.eclipse.draw2d.parts.ScrollableThumbnail;
+import org.eclipse.draw2d.parts.Thumbnail;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.zest.core.widgets.Graph;
 
 import editors.GraphEditor;
+import org.eclipse.swt.layout.GridData;
 
 public class ThumbNailView extends ViewPart {
-	private Table table;
-	private Graph graph;
 	public static final String ID = "FileBrowser.thumbNailView";
+	private IWorkbenchPage page;
+	private GraphEditor ge;
+	private Thumbnail thumbnail;
+	private DisposeListener disposeListener;
+	private Canvas canvas;
 	
 	public ThumbNailView() {
 	}
@@ -25,24 +30,30 @@ public class ThumbNailView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new GridLayout(1, false));
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		IEditorPart graphEditor = page.getActiveEditor();
+		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		ge = new GraphEditor();
+		ge = (GraphEditor) page.getActiveEditor();
 		
-		graph = new Graph(parent, SWT.NONE);
-		graph.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		canvas = new Canvas(parent, SWT.BORDER);
+		canvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		LightweightSystem lws = new LightweightSystem(canvas);
+		thumbnail = new Thumbnail(ge.getGraph().getContents());
+		lws.setContents(thumbnail);
 		
-		if(graphEditor instanceof GraphEditor)
-			graph = ((GraphEditor) graphEditor).getGraph();
-		
-		
-		TableViewer tableViewer = new TableViewer(parent, SWT.BORDER | SWT.FULL_SELECTION);
-		table = tableViewer.getTable();
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		disposeListener = new DisposeListener() {
+	      @Override
+	      public void widgetDisposed(DisposeEvent e) {
+	         if (thumbnail != null) {
+	             thumbnail.deactivate();
+	              thumbnail = null;
+	         }
+	      }
+	    };
+	    ge.getGraph().addDisposeListener(disposeListener);
 	}
 
 	@Override
 	public void setFocus() {
-		table.setFocus();
+		canvas.setFocus();
 	}
-
 }

@@ -41,6 +41,7 @@ import org.osgi.framework.FrameworkUtil;
 
 import utils.FileTreeLabelProvider;
 import views.TestOutlineView;
+import views.ThumbNailView;
 
 @SuppressWarnings("unused")
 public class GraphEditor extends EditorPart {
@@ -139,7 +140,7 @@ public class GraphEditor extends EditorPart {
 				else
 					olv.getText().setText("Folder Name : " + file.getName() + "\nParent Folder : " + file.getParent());
 				
-				olv.getThumbNail().redraw();
+				olv.getCanvas().redraw();
 			}
 			
 			@Override
