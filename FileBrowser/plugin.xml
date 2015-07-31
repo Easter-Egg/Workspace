@@ -67,6 +67,12 @@
             id="FileBrowser.graphEditor"
             name="GraphView">
       </editor>
+      <editor
+            class="editors.TestEditor"
+            default="false"
+            id="filebroswer.TestEditor"
+            name="TE">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -104,9 +110,34 @@
             name="Copy">
       </command>
       <command
-            defaultHandler="handlers.ChangeLayoutStyleHandler"
-            id="FileBrowser.command.changeLayout"
-            name="Change Layout">
+            defaultHandler="handlers.NomalConnectionRouterHandler"
+            id="FileBrowser.command.nomalConnectionRouter"
+            name="Nomal Connection Router">
+      </command>
+      <command
+            defaultHandler="handlers.ManhattanConnectionRouterHandler"
+            id="FileBrowser.command.manhattanConnectionRouter"
+            name="Manhattan Connection Router">
+      </command>
+      <command
+            defaultHandler="handlers.NomalTreeLayoutAlgorithmHandler"
+            id="FileBrowser.command.nomalTreeLayoutAlgorithm"
+            name="Nomal Tree Layout Algorithm">
+      </command>
+      <command
+            defaultHandler="handlers.HorizontalTreeLayoutAlgorithmHandler"
+            id="FileBrowser.command.horizontalTreeLayoutAlgorithm"
+            name="Horizontal Tree Layout Algorithm">
+      </command>
+      <command
+            defaultHandler="handlers.ZoomInHandler"
+            id="FileBrowser.command.zoomIn"
+            name="Zoom In">
+      </command>
+      <command
+            defaultHandler="handlers.ZoomOutHandler"
+            id="FileBrowser.command.zoomOut"
+            name="Zoom Out">
       </command>
    </extension>
    <extension
@@ -223,12 +254,13 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="toolbar:FileBrowser.graphEditor">
-         <command
-               commandId="FileBrowser.command.changeLayout"
-               icon="icons/File.ico"
-               style="push">
-         </command>
+            locationURI="toolbar:FileBrowser.GraphEditor">
+         <control
+               class="utils.ControlConnectionRouter">
+         </control>
+         <control
+               class="utils.ControlLayoutAlgorithm">
+         </control>
       </menuContribution>
    </extension>
    <extension
@@ -248,6 +280,16 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+2">
       </key>
+      <key
+            commandId="FileBrowser.command.zoomIn"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+9">
+      </key>
+      <key
+            commandId="FileBrowser.command.zoomOut"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+0">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -263,6 +305,13 @@
             </with>
          </enabledWhen> 
       </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.dropActions">
+      <action
+            class="utils.MyDropListener"
+            id="FileBrowser.action.drop">
+      </action>
    </extension>
 
 </plugin>

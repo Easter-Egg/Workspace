@@ -6,8 +6,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -30,8 +28,6 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.EditorPart;
 
-import views.TestOutlineView;
-
 public class ImageEditor extends EditorPart{
 	public static final String ID = "FileBrowser.ImageEditor";
 	public ScrollBar hBar = null;
@@ -40,6 +36,7 @@ public class ImageEditor extends EditorPart{
 	public ToolBarManager tm;
 	private Image image;
 	public Canvas canvas;
+	@SuppressWarnings("unused")
 	private IWorkbenchPage page;
 	
 	public ImageEditor() {
@@ -165,7 +162,7 @@ public class ImageEditor extends EditorPart{
 			}
 		});
 		
-		canvas.addFocusListener(new FocusListener(){
+		/*canvas.addFocusListener(new FocusListener(){
 			@Override
 			public void focusGained(FocusEvent e) {
 				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
@@ -174,7 +171,7 @@ public class ImageEditor extends EditorPart{
 			@Override
 			public void focusLost(FocusEvent e) {
 			}
-		});
+		});*/
 		
 		MenuManager menuManager = new MenuManager();
 		Menu menu = menuManager.createContextMenu(canvas);

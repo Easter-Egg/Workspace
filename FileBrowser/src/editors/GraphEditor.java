@@ -3,16 +3,21 @@ package editors;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.draw2d.Viewport;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -29,6 +34,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.menus.IMenuService;
+import org.eclipse.ui.part.EditorInputTransfer;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.zest.core.widgets.Graph;
 import org.eclipse.zest.core.widgets.GraphConnection;
@@ -39,34 +45,46 @@ import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
+import utils.FileModel;
 import utils.FileTreeLabelProvider;
 import views.TestOutlineView;
-import views.ThumbNailView;
 
 @SuppressWarnings("unused")
 public class GraphEditor extends EditorPart {
-	public GraphEditor() {
-	}
-	public static final String ID = "FileBrowser.graphEditor";
-	private Graph graph;
 	
+	public static final String ID = "FileBrowser.graphEditor";
+
+	private FileStoreEditorInput fsInput;
+	
+	private Graph graph;
 	private GraphConnection conn;
 	private GraphConnection childConn;
-	public ToolBarManager tm;
-
+	
+	private ToolBarManager tm;
 	private IWorkbenchPage page;
+	private TestOutlineView olv;
 	private GraphNode root;
+	
+	private List<FileModel> fileModelList;
+	
+	public GraphEditor() {
+	}
 	
 	@Override
 	public void createPartControl(Composite parent) {
+		int operations = DND.DROP_COPY | DND.DROP_DEFAULT | DND.DROP_MOVE;
+		Transfer[] transferTypes = new Transfer[] {EditorInputTransfer.getInstance()};
+		
 		parent.setLayout(new GridLayout(1, false));
 		ToolBar toolbar = new ToolBar(parent, SWT.None);
 		toolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		ToolBarManager tm = new ToolBarManager(toolbar);
 		this.tm = tm;		
-		((IMenuService) getEditorSite().getService(IMenuService.class)).populateContributionManager(tm, "toolbar:FileBrowser.graphEditor");
+		((IMenuService) getEditorSite().getService(IMenuService.class)).populateContributionManager(tm, "toolbar:FileBrowser.GraphEditor");
 		
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
+		
 		Bundle bundle = FrameworkUtil.getBundle(FileTreeLabelProvider.class);
 		URL url = FileLocator.find(bundle, new Path("icons/folder.png"), null);
 		ImageDescriptor imageDcr = ImageDescriptor.createFromURL(url);
@@ -76,10 +94,17 @@ public class GraphEditor extends EditorPart {
 		imageDcr = ImageDescriptor.createFromURL(url);
 		Image fileImage = imageDcr.createImage();
 		
+		IEditorInput input = (IEditorInput) getEditorInput();
+		Object obj = input.getAdapter(FileStoreEditorInput.class);
 		
-		FileStoreEditorInput fsInput = (FileStoreEditorInput)getEditorInput();
+		if(obj != null){
+			fsInput = (FileStoreEditorInput) obj;
+		}
+		
 		URI uri = fsInput.getURI();
 		File file = new File(uri);
+		
+		fileModelList = new ArrayList<FileModel>();
 		
 		graph = new Graph(parent, SWT.NONE);
 		graph.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -129,17 +154,26 @@ public class GraphEditor extends EditorPart {
 		}
 		
 		graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		
+		graph.addMouseWheelListener(new MouseWheelListener() {
+			
+			@Override
+			public void mouseScrolled(MouseEvent e) {
+				if((e.stateMask & SWT.CTRL) == 0)
+					return;
+				
+				if(e.count > 0)
+					graph.getRootLayer().setScale(graph.getRootLayer().getScale()*1.1f);
+				
+				if(e.count < 0)
+					graph.getRootLayer().setScale(graph.getRootLayer().getScale()*0.9f);
+			}
+		});
+		
+		
 		graph.addFocusListener(new FocusListener(){
 			@Override
 			public void focusGained(FocusEvent e) {
-
-				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
-				if(file.getParent() == null)
-					olv.getText().setText("Folder Name : " + file.toString());
-				
-				else
-					olv.getText().setText("Folder Name : " + file.getName() + "\nParent Folder : " + file.getParent());
-				
 				olv.getCanvas().redraw();
 			}
 			
@@ -153,19 +187,28 @@ public class GraphEditor extends EditorPart {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
 				if(e.item instanceof GraphNode){
 					GraphNode selectedNode = (GraphNode) e.item;
-					TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
+					fileModelList.clear();
 					
 					if(!selectedNode.getTargetConnections().isEmpty()){
 						GraphConnection gc = (GraphConnection) selectedNode.getTargetConnections().get(0);
 						GraphNode srcOfSelectedNode = (GraphNode) gc.getSource();
-						olv.getText().setText("폴더명 : " + selectedNode.getText() + "\n상위폴더 : " + srcOfSelectedNode.getText());
+						File nodeFile = new File(file.getPath() + "\\" + selectedNode.getText());
+						
+						fileModelList.add(new FileModel("파일명", selectedNode.getText()));
+						fileModelList.add(new FileModel("상위폴더", srcOfSelectedNode.getText()));
+						fileModelList.add(new FileModel("경로", nodeFile.getPath()));
+						fileModelList.add(new FileModel("크기", nodeFile.length() + " Bytes"));
 					}
 					else{
-						olv.getText().setText("폴더명 : " + selectedNode.getText() + "\n상위폴더 : " + file.getParent());
+						fileModelList.add(new FileModel("파일명", selectedNode.getText()));
+						fileModelList.add(new FileModel("상위폴더", file.getParent()));
+						fileModelList.add(new FileModel("경로", file.getPath()));
+						fileModelList.add(new FileModel("크기", file.length() + " Bytes"));
 					}
+					olv.getTableViewer().setInput(fileModelList);
+					olv.getTableViewer().refresh();
 				}
 				
 				else {
@@ -180,6 +223,7 @@ public class GraphEditor extends EditorPart {
 			}
 			
 		});
+		
 	}
 
 	@Override
@@ -189,6 +233,10 @@ public class GraphEditor extends EditorPart {
 	
 	public Graph getGraph(){
 		return graph;
+	}
+	
+	public ToolBarManager getToolBarManager(){
+		return tm;
 	}
 
 	@Override

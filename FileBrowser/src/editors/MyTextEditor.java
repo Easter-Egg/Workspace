@@ -14,8 +14,6 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -30,8 +28,7 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.EditorPart;
 
-import views.TestOutlineView;
-
+@SuppressWarnings("unused")
 public class MyTextEditor extends EditorPart {
 	public static final String ID = "FileBrowser.MyTextEditor";
 	private TextViewer textViewer;
@@ -102,7 +99,7 @@ public class MyTextEditor extends EditorPart {
 			style.addStyleRange(new StyleRange(0, firstLineLength, red, null, SWT.BOLD));
 			textViewer.changeTextPresentation(style, true);
 		}
-		
+		/*
 		styledText.addFocusListener(new FocusListener(){
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -113,7 +110,7 @@ public class MyTextEditor extends EditorPart {
 			public void focusLost(FocusEvent e) {
 				
 			}
-		});
+		});*/
 	}
 
 	private String readFileContents() {

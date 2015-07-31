@@ -2,6 +2,10 @@ package views;
 
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.parts.Thumbnail;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -11,12 +15,15 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import editors.GraphEditor;
+import utils.FileModel;
 
 public class TestOutlineView extends ViewPart {
 	
@@ -27,6 +34,7 @@ public class TestOutlineView extends ViewPart {
 	private Text text;
 	private IWorkbenchPage page;
 	private GraphEditor ge;
+	private TableViewer tableviewer;
 	
 	private DisposeListener disposeListener = new DisposeListener() {
 	      @Override
@@ -52,7 +60,6 @@ public class TestOutlineView extends ViewPart {
 		LightweightSystem lws = new LightweightSystem(canvas);
 		
 		canvas.addListener(SWT.Paint, new Listener(){
-
 			@Override
 			public void handleEvent(Event event) {
 				if(page.getActiveEditor() instanceof GraphEditor) {
@@ -63,14 +70,62 @@ public class TestOutlineView extends ViewPart {
 				}
 			}
 		});
-        
-		text = new Text(parent, SWT.READ_ONLY | SWT.MULTI | SWT.BORDER);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		text.setText("print infomation of selected file");
+		
+		createViewer(parent);
+	}
+	
+	public void createViewer(Composite parent){
+		tableviewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+		createColumns(parent, tableviewer);
+		final Table table = tableviewer.getTable();
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		tableviewer.setContentProvider(new ArrayContentProvider());
+		tableviewer.setInput(null);
+		
+	    GridData gridData = new GridData();
+	    gridData.verticalAlignment = GridData.FILL;
+	    gridData.horizontalSpan = 2;
+	    gridData.grabExcessHorizontalSpace = true;
+	    gridData.grabExcessVerticalSpace = true;
+	    gridData.horizontalAlignment = GridData.FILL;
+	    tableviewer.getControl().setLayoutData(gridData);
+	}
+	
+	public void createColumns(final Composite parent, final TableViewer viewer){
+		
+		TableViewerColumn col = createTableViewerColumn("Attribute", 120, 0);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText (Object element){
+				FileModel fm = (FileModel) element;
+				return fm.getAttribute();
+			}
+		});
+		
+		col = createTableViewerColumn("Value", 120, 0);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText (Object element){
+				FileModel fm = (FileModel) element;
+				return fm.getValue();
+			}
+		});
+	}
+	
+	private TableViewerColumn createTableViewerColumn(String title, int bound, final int colNumber) {
+	    final TableViewerColumn viewerColumn = new TableViewerColumn(tableviewer,
+	        SWT.NONE);
+	    final TableColumn column = viewerColumn.getColumn();
+	    column.setText(title);
+	    column.setWidth(bound);
+	    column.setResizable(true);
+	    column.setMoveable(true);
+	    return viewerColumn;
 	}
 
 	public void setFocus() {
-		text.setFocus();
+		canvas.setFocus();
 	}
 	
 	public Text getText(){
@@ -79,6 +134,10 @@ public class TestOutlineView extends ViewPart {
 	
 	public Canvas getCanvas(){
 		return canvas;
+	}
+	
+	public TableViewer getTableViewer(){
+		return tableviewer;
 	}
 	
 }
