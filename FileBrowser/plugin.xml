@@ -68,10 +68,10 @@
             name="GraphView">
       </editor>
       <editor
-            class="editors.TestEditor"
+            class="editors.ChartEditor"
             default="false"
-            id="filebroswer.TestEditor"
-            name="TE">
+            id="FileBrowser.chartEditor"
+            name="ChartEditor">
       </editor>
    </extension>
    <extension

@@ -265,4 +265,9 @@ public class GraphEditor extends EditorPart {
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
+	
+	@Override
+	public void dispose(){
+		olv.getCanvas().dispose();
+	}
 }

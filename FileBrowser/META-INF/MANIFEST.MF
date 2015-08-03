@@ -22,6 +22,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.zest.core;bundle-version="1.5.200",
  org.eclipse.zest.layouts;bundle-version="1.1.200",
  org.eclipse.osgi,
- org.eclipse.equinox.registry
+ org.eclipse.equinox.registry,
+ org.eclipse.nebula.visualization.xygraph;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
