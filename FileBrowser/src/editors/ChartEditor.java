@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -12,6 +13,8 @@ import org.eclipse.draw2d.KeyListener;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.nebula.visualization.xygraph.dataprovider.CircularBufferDataProvider;
+import org.eclipse.nebula.visualization.xygraph.figures.Annotation;
+import org.eclipse.nebula.visualization.xygraph.figures.IAnnotationListener;
 import org.eclipse.nebula.visualization.xygraph.figures.Trace;
 import org.eclipse.nebula.visualization.xygraph.figures.Trace.PointStyle;
 import org.eclipse.nebula.visualization.xygraph.figures.XYGraph;
@@ -24,7 +27,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -36,6 +41,7 @@ public class ChartEditor extends EditorPart{
 	public static final String ID = "FileBrowser.chartEditor";
 	private Canvas canvas;
 	private XYGraph xyGraph;
+	private Annotation anno;
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -64,7 +70,7 @@ public class ChartEditor extends EditorPart{
 		
 	}
 
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "resource"})
 	@Override
 	public void createPartControl(Composite parent) {
 		canvas = new Canvas(parent, SWT.BORDER);
@@ -72,13 +78,13 @@ public class ChartEditor extends EditorPart{
 		final LightweightSystem lws = new LightweightSystem(canvas);
 		
 		int i = 0;
+		double x,y,y2;
 		
-		double xValue[] = new double[11];
-		double yValue[] = new double[11];
+		ArrayList<Double> xList = new ArrayList<Double>();
+		ArrayList<Double> yList = new ArrayList<Double>();
+		ArrayList<Double> y2List = new ArrayList<Double>();
+		
 		xyGraph = new XYGraph();
-		
-		xyGraph.getXAxisList().get(0).setTitle("X 축");
-		xyGraph.getYAxisList().get(0).setTitle("Y 축");
 		
 		IEditorInput editorInput = getEditorInput();
 		FileStoreEditorInput fsInput = (FileStoreEditorInput)editorInput;
@@ -96,8 +102,13 @@ public class ChartEditor extends EditorPart{
 			
 			while((line = br.readLine()) != null){
 				st = new StringTokenizer(line, ",");
-				xValue[i] = Double.parseDouble(st.nextToken());
-				yValue[i] = Double.parseDouble(st.nextToken());
+				x = Double.parseDouble(st.nextToken());
+				y = Double.parseDouble(st.nextToken());
+				y2 = Double.parseDouble(st.nextToken());
+				
+				xList.add(x);
+				yList.add(y);
+				y2List.add(y2);
 				i++;
 			}
 			
@@ -105,17 +116,41 @@ public class ChartEditor extends EditorPart{
 			e.printStackTrace();
 		}
 		
+		double xValue[] = new double[xList.size()];
+		double yValue[] = new double[yList.size()];
+		double y2Value[] = new double[y2List.size()];
+		
+		for(i = 0 ; i < xList.size() ; i++)
+			xValue[i] = xList.get(i);
+		
+		
+		for(i = 0 ; i < yList.size() ; i++)
+			yValue[i] = yList.get(i);
+		
+		for(i = 0 ; i < y2List.size() ; i++)
+			y2Value[i] = y2List.get(i);
+		
 		CircularBufferDataProvider traceDataProvider = new CircularBufferDataProvider(false);
 		traceDataProvider.setBufferSize(i);		
 		traceDataProvider.setCurrentXDataArray(xValue);
 		traceDataProvider.setCurrentYDataArray(yValue);
-		
 		Trace trace = new Trace(xyGraph.getYAxisList().get(0).getTitle(), xyGraph.primaryXAxis, xyGraph.primaryYAxis, traceDataProvider);			
 		trace.setPointStyle(PointStyle.CIRCLE);
+
+		CircularBufferDataProvider traceDataProvider2 = new CircularBufferDataProvider(false);
+		traceDataProvider2.setBufferSize(i);		
+		traceDataProvider2.setCurrentXDataArray(xValue);
+		traceDataProvider2.setCurrentYDataArray(y2Value);
+		Trace trace2 = new Trace(xyGraph.getYAxisList().get(0).getTitle() + " 2", xyGraph.primaryXAxis, xyGraph.primaryYAxis, traceDataProvider2);			
+		trace2.setPointStyle(PointStyle.CROSS);
 		
+		anno = new Annotation("TEST", trace);
+		Annotation anno2 =new Annotation("TEST2", trace2);
+		
+		xyGraph.getPlotArea().getAnnotationList().add(anno2);
 		xyGraph.addTrace(trace);
+		xyGraph.addTrace(trace2);
 		xyGraph.performAutoScale();
-		
 		xyGraph.setFocusTraversable(true);
 		xyGraph.setRequestFocusEnabled(true);
 
@@ -140,6 +175,26 @@ public class ChartEditor extends EditorPart{
 						loader.save(path, SWT.IMAGE_PNG);
 					}
 				}
+				
+				else if((ke.getState() == SWT.CONTROL) && (ke.keycode == 'r')) {
+					xyGraph.performAutoScale();
+				}
+			}
+		});
+		
+		canvas.addListener(SWT.MouseDown ,new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				xyGraph.getPlotArea().addAnnotation(anno);
+				xyGraph.getPlotArea().addAnnotation(anno2);
+			}
+		});
+		
+		canvas.addListener(SWT.MouseUp ,new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				xyGraph.getPlotArea().removeAnnotation(anno);
+				xyGraph.getPlotArea().removeAnnotation(anno2);
 			}
 		});
 		
@@ -159,7 +214,6 @@ public class ChartEditor extends EditorPart{
 				}
 			}
 		});
-		
 		lws.setContents(xyGraph);
 	}
 
@@ -167,5 +221,4 @@ public class ChartEditor extends EditorPart{
 	public void setFocus() {
 		canvas.setFocus();
 	}
-
 }
