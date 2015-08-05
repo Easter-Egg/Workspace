@@ -29,7 +29,7 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.EditorInputTransfer;
 import org.eclipse.ui.part.ViewPart;
 
-import editors.GraphEditor;
+import editors.MyGraphicalEditor;
 import utils.FileOpenAction;
 import utils.FileTreeContentProvider;
 import utils.FileTreeLabelProvider;
@@ -111,7 +111,7 @@ public class BrowserView extends ViewPart {
 					IFileStore fs = EFS.getLocalFileSystem().getStore(ipath);
 					FileStoreEditorInput fileStoreEditorInput = new FileStoreEditorInput(fs);
 					EditorInputTransfer.EditorInputData inputs[] = new EditorInputTransfer.EditorInputData[1];
-					EditorInputTransfer.EditorInputData data = EditorInputTransfer.createEditorInputData(GraphEditor.ID, fileStoreEditorInput);
+					EditorInputTransfer.EditorInputData data = EditorInputTransfer.createEditorInputData(MyGraphicalEditor.ID, fileStoreEditorInput);
 					inputs[0] = data;
 					event.data = inputs;
 					return;

@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import editors.GraphEditor;
+import editors.MyGraphicalEditor;
 import utils.FileModel;
 
 public class TestOutlineView extends ViewPart {
@@ -33,7 +33,7 @@ public class TestOutlineView extends ViewPart {
 	private Thumbnail thumbnail;
 	private Text text;
 	private IWorkbenchPage page;
-	private GraphEditor ge;
+	private MyGraphicalEditor ge;
 	private TableViewer tableviewer;
 	
 	private DisposeListener disposeListener = new DisposeListener() {
@@ -62,8 +62,8 @@ public class TestOutlineView extends ViewPart {
 		canvas.addListener(SWT.Paint, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
-				if(page.getActiveEditor() instanceof GraphEditor) {
-					ge = (GraphEditor) page.getActiveEditor();
+				if(page.getActiveEditor() instanceof MyGraphicalEditor) {
+					ge = (MyGraphicalEditor) page.getActiveEditor();
 					thumbnail = new Thumbnail(ge.getGraph().getContents());
 					lws.setContents(thumbnail);
 					ge.getGraph().addDisposeListener(disposeListener);

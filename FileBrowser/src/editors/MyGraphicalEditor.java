@@ -43,6 +43,9 @@ import org.eclipse.zest.core.widgets.GraphConnection;
 import org.eclipse.zest.core.widgets.GraphNode;
 import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.layouts.LayoutStyles;
+import org.eclipse.zest.layouts.algorithms.GridLayoutAlgorithm;
+import org.eclipse.zest.layouts.algorithms.HorizontalShift;
+import org.eclipse.zest.layouts.algorithms.HorizontalTreeLayoutAlgorithm;
 import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
@@ -72,19 +75,44 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 	private List<FileModel> fileModelList;
 	
 	
-	public void createContents(Composite parent) {
+	
+	/*public void createContents(Composite parent) {
+		
+	}*/
+	
+
+	public MyGraphicalEditor() {
+		setEditDomain(new DefaultEditDomain(this));
+	}
+	
+	protected void configureGraphicalViewer() {
+		super.configureGraphicalViewer();
+	}
+	
+	public void commandStackChanged(EventObject event) {
+		firePropertyChange(IEditorPart.PROP_DIRTY);
+		super.commandStackChanged(event);
+	}
+
+	@Override
+	protected void initializeGraphicalViewer() {
+		// TODO Auto-generated method stub
+		GraphicalViewer viewer = getGraphicalViewer();
+		Composite parent = ((Composite) viewer.getControl());
+		
+		
 		parent.setLayout(new GridLayout(1, false));
-		/*ToolBar toolbar = new ToolBar(parent, SWT.None);
+		ToolBar toolbar = new ToolBar(parent, SWT.None);
 		toolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		ToolBarManager tm = new ToolBarManager(toolbar);
 		this.tm = tm;		
-		((IMenuService) getEditorSite().getService(IMenuService.class)).populateContributionManager(tm, "toolbar:FileBrowser.GraphEditor");*/
+		((IMenuService) getEditorSite().getService(IMenuService.class)).populateContributionManager(tm, "toolbar:FileBrowser.MyGraphicalEditor");
 		
 		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
 		
 		Bundle bundle = FrameworkUtil.getBundle(FileTreeLabelProvider.class);
-		URL url = FileLocator.find(bundle, new Path("icons/folder.png"), null);
+		URL url = FileLocator.find(bundle, new Path("icons/Folder.ico"), null);
 		ImageDescriptor imageDcr = ImageDescriptor.createFromURL(url);
 		Image folderImage = imageDcr.createImage();
 		
@@ -106,13 +134,37 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 		
 		graph = new Graph(parent, SWT.NONE);
 		graph.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		graph.addListener(SWT.Resize, new Listener(){
+		
+		graph.addListener(SWT.Resize, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+				if (graph.getLayoutAlgorithm().getClass().equals(HorizontalTreeLayoutAlgorithm.class)) {
+					graph.setLayoutAlgorithm(new HorizontalTreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+				} else if (graph.getLayoutAlgorithm().getClass().equals(TreeLayoutAlgorithm.class)) {
+					graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+				} else if (graph.getLayoutAlgorithm().getClass().equals(HorizontalShift.class)) {
+					graph.setLayoutAlgorithm(new HorizontalShift(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+				} else if (graph.getLayoutAlgorithm().getClass().equals(GridLayoutAlgorithm.class)) {
+					graph.setLayoutAlgorithm(new GridLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+				}
 			}
-		});
-		
+		});	
+		graph.addMouseWheelListener( new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(org.eclipse.swt.events.MouseEvent e) {
+				 if (( e.stateMask & SWT.CTRL ) == 0)
+	                    return;     
+	                if (e.count > 0) {
+					System.out.println("Zoom In");
+					graph.getRootLayer().setScale(graph.getRootLayer().getScale()*1.1f);
+	                    //viewer.getGraphControl().getZoomManager().zoomOut();
+	                } else if (e.count < 0) {
+						System.out.println("Zoom Out");
+						graph.getRootLayer().setScale(graph.getRootLayer().getScale()*0.9f);
+	                    //viewer.getGraphControl().getZoomManager().zoomIn();
+	                }
+			}
+        } );
 		if(file.getParent() == null){
 			root = new GraphNode(graph, SWT.NONE, file.toString(), folderImage);
 			setPartName(file.toString());
@@ -221,29 +273,6 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 			}
 			
 		});
-		
-	}
-	
-
-	public MyGraphicalEditor() {
-		setEditDomain(new DefaultEditDomain(this));
-	}
-	
-	protected void configureGraphicalViewer() {
-		super.configureGraphicalViewer();
-	}
-	
-	public void commandStackChanged(EventObject event) {
-		firePropertyChange(IEditorPart.PROP_DIRTY);
-		super.commandStackChanged(event);
-	}
-
-	@Override
-	protected void initializeGraphicalViewer() {
-		// TODO Auto-generated method stub
-		GraphicalViewer viewer = getGraphicalViewer();
-		Composite parent = ((Composite) viewer.getControl());
-		createContents(parent);
 	}
 
 	@Override
@@ -268,4 +297,10 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 		setInput(input);
 		setPartName(input.getName());
 	}
+	
+	public Graph getGraph(){
+		return graph;
+	}
+	
+	
 }

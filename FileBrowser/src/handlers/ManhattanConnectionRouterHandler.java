@@ -10,18 +10,18 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.zest.core.widgets.GraphConnection;
 
-import editors.GraphEditor;
+import editors.MyGraphicalEditor;
 
 public class ManhattanConnectionRouterHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		FanRouter f = new FanRouter();
-		IEditorPart editor = (GraphEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		IEditorPart editor = (MyGraphicalEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 		ManhattanConnectionRouter m = new ManhattanConnectionRouter();
 
-		for (int i = 0; i < ((GraphEditor) editor).getGraph().getConnections().size(); i++) {
-			Connection gf = ((GraphConnection) ((GraphEditor) editor).getGraph().getConnections().get(i)).getConnectionFigure();
+		for (int i = 0; i < ((MyGraphicalEditor) editor).getGraph().getConnections().size(); i++) {
+			Connection gf = ((GraphConnection) ((MyGraphicalEditor) editor).getGraph().getConnections().get(i)).getConnectionFigure();
 			gf.setConnectionRouter(f);
 			f.route(gf);
 			f.setNextRouter(m);

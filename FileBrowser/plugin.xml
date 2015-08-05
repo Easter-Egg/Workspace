@@ -56,12 +56,6 @@
             name="ImageEditor">
       </editor>
       <editor
-            class="editors.GraphEditor"
-            default="false"
-            id="FileBrowser.graphEditor"
-            name="GraphView">
-      </editor>
-      <editor
             class="editors.ChartEditor"
             default="false"
             id="FileBrowser.chartEditor"
@@ -71,7 +65,7 @@
             class="editors.MyGraphicalEditor"
             default="false"
             id="FileBrowser.myGraphicalEditor"
-            name="MGE">
+            name="MyGraphicalEditor">
       </editor>
    </extension>
    <extension
@@ -138,6 +132,16 @@
             defaultHandler="handlers.ZoomOutHandler"
             id="FileBrowser.command.zoomOut"
             name="Zoom Out">
+      </command>
+      <command
+            defaultHandler="handlers.HorizontalShiftLayoutAlgorithmHandler"
+            id="FileBrowser.command.horizontalShiftLayoutAlgorithm"
+            name="Horizontal Shift Layout Algorithm">
+      </command>
+      <command
+            defaultHandler="handlers.GridLayoutAlgorithmHandler"
+            id="FileBrowser.command.gridLayoutAlgorithm"
+            name="Grid Layout Algorithm">
       </command>
    </extension>
    <extension
@@ -254,13 +258,23 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="toolbar:FileBrowser.GraphEditor">
+            locationURI="toolbar:FileBrowser.MyGraphicalEditor">
          <control
                class="utils.ControlConnectionRouter">
          </control>
          <control
                class="utils.ControlLayoutAlgorithm">
          </control>
+         <command
+               commandId="FileBrowser.command.zoomIn"
+               icon="icons/ZoomIn.ico"
+               style="push">
+         </command>
+         <command
+               commandId="FileBrowser.command.zoomOut"
+               icon="icons/ZoomOut.ico"
+               style="push">
+         </command>
       </menuContribution>
    </extension>
    <extension

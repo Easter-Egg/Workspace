@@ -11,7 +11,7 @@ import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
 
-import editors.GraphEditor;
+import editors.MyGraphicalEditor;
 import editors.ImageEditor;
 import editors.MyTextEditor;
 
@@ -37,19 +37,19 @@ public class OutlineView extends PageBookView {
 	protected PageRec doCreatePage(IWorkbenchPart part) {
 		messagePage = new MessagePage();
 		initPage(messagePage);
-		
+			
 		ei = ((IEditorPart) part).getEditorInput();
 		fsei = (FileStoreEditorInput) ei;
 		File file = new File(fsei.getURI().getPath());
 		
-		if(part instanceof GraphEditor){
+		if(part instanceof MyGraphicalEditor){
 			messagePage.setMessage("Folder is opened with Graph Editor");
 			messagePage.createControl(getPageBook());
 			return new PageRec(part, messagePage);
 		}
 		
 		else{
-			messagePage.setMessage("∆ƒ¿œ∏Ì : " + file.getName() + "\n∆ƒ¿œ≈©±‚ : " + file.length() + " Bytes");
+			messagePage.setMessage("ÌååÏùºÎ™Ö : " + file.getName() + "\nÌååÏùºÌÅ¨Í∏∞ : " + file.length() + " Bytes");
 			messagePage.createControl(getPageBook());
 			return new PageRec(part, messagePage);
 		}
@@ -70,7 +70,7 @@ public class OutlineView extends PageBookView {
 	protected boolean isImportant(IWorkbenchPart part) {
 		// TODO Auto-generated method stub
 		
-		return (part instanceof MyTextEditor || part instanceof ImageEditor || part instanceof GraphEditor);
+		return (part instanceof MyTextEditor || part instanceof ImageEditor || part instanceof MyGraphicalEditor);
 	}
 	
 	public void partBroughtToTop(IWorkbenchPart part) {

@@ -24,6 +24,8 @@ public class ControlLayoutAlgorithm extends WorkbenchWindowControlContribution{
 		Combo c = new Combo(parent, SWT.READ_ONLY);
 		c.add("NomalTree");
 		c.add("HorizontalTree");
+		c.add("HorizontalShift");
+		c.add("Grid");
 		c.addSelectionListener(new SelectionAdapter(){
 			@Override
 			public void widgetSelected(SelectionEvent event) {
@@ -49,6 +51,46 @@ public class ControlLayoutAlgorithm extends WorkbenchWindowControlContribution{
 				}
 				else if (c.getSelectionIndex() == 1){
 					Command command = ((ICommandService) getWorkbenchWindow().getActivePage().getActiveEditor().getEditorSite().getService(ICommandService.class)).getCommand("FileBrowser.command.horizontalTreeLayoutAlgorithm");
+					final Event trigger = new Event();
+					ExecutionEvent executionEvent = ((IHandlerService) getWorkbenchWindow().getActivePage().getActiveEditor().getEditorSite().getService(IHandlerService.class)).createExecutionEvent(command, trigger);
+					try {
+						command.executeWithChecks(executionEvent);
+					} catch (ExecutionException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (NotDefinedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (NotEnabledException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (NotHandledException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				else if (c.getSelectionIndex() == 2){
+					Command command = ((ICommandService) getWorkbenchWindow().getActivePage().getActiveEditor().getEditorSite().getService(ICommandService.class)).getCommand("FileBrowser.command.horizontalShiftLayoutAlgorithm");
+					final Event trigger = new Event();
+					ExecutionEvent executionEvent = ((IHandlerService) getWorkbenchWindow().getActivePage().getActiveEditor().getEditorSite().getService(IHandlerService.class)).createExecutionEvent(command, trigger);
+					try {
+						command.executeWithChecks(executionEvent);
+					} catch (ExecutionException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (NotDefinedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (NotEnabledException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (NotHandledException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				else if (c.getSelectionIndex() == 3){
+					Command command = ((ICommandService) getWorkbenchWindow().getActivePage().getActiveEditor().getEditorSite().getService(ICommandService.class)).getCommand("FileBrowser.command.gridLayoutAlgorithm");
 					final Event trigger = new Event();
 					ExecutionEvent executionEvent = ((IHandlerService) getWorkbenchWindow().getActivePage().getActiveEditor().getEditorSite().getService(IHandlerService.class)).createExecutionEvent(command, trigger);
 					try {
