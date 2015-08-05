@@ -13,8 +13,7 @@ import org.eclipse.draw2d.KeyListener;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.nebula.visualization.xygraph.dataprovider.CircularBufferDataProvider;
-import org.eclipse.nebula.visualization.xygraph.figures.Annotation;
-import org.eclipse.nebula.visualization.xygraph.figures.IAnnotationListener;
+import org.eclipse.nebula.visualization.xygraph.figures.ToolbarArmedXYGraph;
 import org.eclipse.nebula.visualization.xygraph.figures.Trace;
 import org.eclipse.nebula.visualization.xygraph.figures.Trace.PointStyle;
 import org.eclipse.nebula.visualization.xygraph.figures.XYGraph;
@@ -27,9 +26,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -37,11 +34,12 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.EditorPart;
 
 public class ChartEditor extends EditorPart{
+	public ChartEditor() {
+	}
 	
 	public static final String ID = "FileBrowser.chartEditor";
 	private Canvas canvas;
 	private XYGraph xyGraph;
-	private Annotation anno;
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -83,6 +81,7 @@ public class ChartEditor extends EditorPart{
 		ArrayList<Double> xList = new ArrayList<Double>();
 		ArrayList<Double> yList = new ArrayList<Double>();
 		ArrayList<Double> y2List = new ArrayList<Double>();
+		
 		
 		xyGraph = new XYGraph();
 		
@@ -144,10 +143,7 @@ public class ChartEditor extends EditorPart{
 		Trace trace2 = new Trace(xyGraph.getYAxisList().get(0).getTitle() + " 2", xyGraph.primaryXAxis, xyGraph.primaryYAxis, traceDataProvider2);			
 		trace2.setPointStyle(PointStyle.CROSS);
 		
-		anno = new Annotation("TEST", trace);
-		Annotation anno2 =new Annotation("TEST2", trace2);
 		
-		xyGraph.getPlotArea().getAnnotationList().add(anno2);
 		xyGraph.addTrace(trace);
 		xyGraph.addTrace(trace2);
 		xyGraph.performAutoScale();
@@ -182,22 +178,6 @@ public class ChartEditor extends EditorPart{
 			}
 		});
 		
-		canvas.addListener(SWT.MouseDown ,new Listener(){
-			@Override
-			public void handleEvent(Event event) {
-				xyGraph.getPlotArea().addAnnotation(anno);
-				xyGraph.getPlotArea().addAnnotation(anno2);
-			}
-		});
-		
-		canvas.addListener(SWT.MouseUp ,new Listener(){
-			@Override
-			public void handleEvent(Event event) {
-				xyGraph.getPlotArea().removeAnnotation(anno);
-				xyGraph.getPlotArea().removeAnnotation(anno2);
-			}
-		});
-		
 		canvas.addMouseWheelListener(new MouseWheelListener(){
 
 			@Override
@@ -214,7 +194,9 @@ public class ChartEditor extends EditorPart{
 				}
 			}
 		});
-		lws.setContents(xyGraph);
+		
+		ToolbarArmedXYGraph toolbarArmedXYGraph = new ToolbarArmedXYGraph(xyGraph);
+		lws.setContents(toolbarArmedXYGraph);
 	}
 
 	@Override

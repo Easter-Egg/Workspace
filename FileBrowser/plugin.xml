@@ -39,12 +39,6 @@
             name="Outline"
             restorable="true">
       </view>
-      <view
-            class="views.ThumbNailView"
-            id="FileBrowser.thumbNailView"
-            name="Thumbnail"
-            restorable="true">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -72,6 +66,12 @@
             default="false"
             id="FileBrowser.chartEditor"
             name="ChartEditor">
+      </editor>
+      <editor
+            class="editors.MyGraphicalEditor"
+            default="false"
+            id="FileBrowser.myGraphicalEditor"
+            name="MGE">
       </editor>
    </extension>
    <extension
