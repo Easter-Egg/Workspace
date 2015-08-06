@@ -72,14 +72,7 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 	private TestOutlineView olv;
 	private GraphNode root;
 	
-	private List<FileModel> fileModelList;
-	
-	
-	
-	/*public void createContents(Composite parent) {
-		
-	}*/
-	
+	private List<FileModel> fileModelList;	
 
 	public MyGraphicalEditor() {
 		setEditDomain(new DefaultEditDomain(this));
@@ -96,10 +89,8 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 
 	@Override
 	protected void initializeGraphicalViewer() {
-		// TODO Auto-generated method stub
 		GraphicalViewer viewer = getGraphicalViewer();
 		Composite parent = ((Composite) viewer.getControl());
-		
 		
 		parent.setLayout(new GridLayout(1, false));
 		ToolBar toolbar = new ToolBar(parent, SWT.None);
@@ -123,9 +114,8 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 		IEditorInput input = (IEditorInput) getEditorInput();
 		Object obj = input.getAdapter(FileStoreEditorInput.class);
 		
-		if(obj != null){
+		if(obj != null)
 			fsInput = (FileStoreEditorInput) obj;
-		}
 		
 		URI uri = fsInput.getURI();
 		File file = new File(uri);
@@ -153,18 +143,18 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 			@Override
 			public void mouseScrolled(org.eclipse.swt.events.MouseEvent e) {
 				 if (( e.stateMask & SWT.CTRL ) == 0)
-	                    return;     
-	                if (e.count > 0) {
-					System.out.println("Zoom In");
-					graph.getRootLayer().setScale(graph.getRootLayer().getScale()*1.1f);
-	                    //viewer.getGraphControl().getZoomManager().zoomOut();
-	                } else if (e.count < 0) {
-						System.out.println("Zoom Out");
-						graph.getRootLayer().setScale(graph.getRootLayer().getScale()*0.9f);
-	                    //viewer.getGraphControl().getZoomManager().zoomIn();
-	                }
+	                    return; 
+				 
+                if (e.count > 0) {
+                	System.out.println("Zoom In");
+                	graph.getRootLayer().setScale(graph.getRootLayer().getScale()*1.1f);
+                } else if (e.count < 0) {
+					System.out.println("Zoom Out");
+					graph.getRootLayer().setScale(graph.getRootLayer().getScale()*0.9f);
+                }
 			}
         } );
+		
 		if(file.getParent() == null){
 			root = new GraphNode(graph, SWT.NONE, file.toString(), folderImage);
 			setPartName(file.toString());
@@ -173,7 +163,7 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 			root = new GraphNode(graph, SWT.NONE, file.getName(), folderImage);
 		}
 		
-		if(file.listFiles().length != 0){
+		if(file.listFiles() != null){
 			for(File childFile : file.listFiles()){
 				if(childFile.isDirectory()){
 					GraphNode childNode = new GraphNode(graph, SWT.NONE, childFile.getName(), folderImage);
@@ -262,22 +252,22 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 				}
 				
 				else {
-					// do Nothing
+					fileModelList.clear();
+					olv.getTableViewer().setInput(fileModelList);
+					olv.getTableViewer().refresh();
 				}
 			}
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
-			
 		});
+		graph.setFocus();
 	}
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -302,5 +292,12 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 		return graph;
 	}
 	
-	
+	@Override
+	public void dispose(){
+		graph.dispose();
+		fileModelList.clear();
+		olv.getCanvas().redraw();
+		olv.getTableViewer().setInput(fileModelList);
+		olv.getTableViewer().refresh();
+	}
 }

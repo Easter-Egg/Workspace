@@ -320,12 +320,5 @@
          </enabledWhen> 
       </handler>
    </extension>
-   <extension
-         point="org.eclipse.ui.dropActions">
-      <action
-            class="utils.MyDropListener"
-            id="FileBrowser.action.drop">
-      </action>
-   </extension>
 
 </plugin>

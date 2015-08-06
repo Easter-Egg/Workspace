@@ -29,6 +29,7 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.EditorInputTransfer;
 import org.eclipse.ui.part.ViewPart;
 
+import editors.ChartEditor;
 import editors.MyGraphicalEditor;
 import utils.FileOpenAction;
 import utils.FileTreeContentProvider;
@@ -104,6 +105,7 @@ public class BrowserView extends ViewPart {
 			@Override
 			public void dragSetData(DragSourceEvent event) {
 				if(EditorInputTransfer.getInstance().isSupportedType(event.dataType)){
+					EditorInputTransfer.EditorInputData data = null;
 					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 					Object selectedObjects = selection.toArray()[0];
 					File file = new File(selectedObjects.toString());
@@ -111,7 +113,15 @@ public class BrowserView extends ViewPart {
 					IFileStore fs = EFS.getLocalFileSystem().getStore(ipath);
 					FileStoreEditorInput fileStoreEditorInput = new FileStoreEditorInput(fs);
 					EditorInputTransfer.EditorInputData inputs[] = new EditorInputTransfer.EditorInputData[1];
-					EditorInputTransfer.EditorInputData data = EditorInputTransfer.createEditorInputData(MyGraphicalEditor.ID, fileStoreEditorInput);
+					if(file.isDirectory()) {
+						data = EditorInputTransfer.createEditorInputData(MyGraphicalEditor.ID, fileStoreEditorInput);
+					} else if(file.getName().endsWith(".csv")){
+						data = EditorInputTransfer.createEditorInputData(ChartEditor.ID, fileStoreEditorInput);
+					}
+					else{
+						System.out.println("DND event is triggerd by directory or .csv files");
+						return;
+					}
 					inputs[0] = data;
 					event.data = inputs;
 					return;

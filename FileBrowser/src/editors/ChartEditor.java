@@ -8,10 +8,15 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.draw2d.AncestorListener;
+import org.eclipse.draw2d.CoordinateListener;
+import org.eclipse.draw2d.FigureListener;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.KeyEvent;
 import org.eclipse.draw2d.KeyListener;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.nebula.visualization.xygraph.dataprovider.CircularBufferDataProvider;
 import org.eclipse.nebula.visualization.xygraph.figures.ToolbarArmedXYGraph;
 import org.eclipse.nebula.visualization.xygraph.figures.Trace;
@@ -68,13 +73,13 @@ public class ChartEditor extends EditorPart{
 		
 	}
 
-	@SuppressWarnings({ "resource"})
+	@SuppressWarnings({ "resource", "unused"})
 	@Override
 	public void createPartControl(Composite parent) {
 		canvas = new Canvas(parent, SWT.BORDER);
 		canvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
 		final LightweightSystem lws = new LightweightSystem(canvas);
-		
 		int i = 0;
 		double x,y,y2;
 		
@@ -82,9 +87,7 @@ public class ChartEditor extends EditorPart{
 		ArrayList<Double> yList = new ArrayList<Double>();
 		ArrayList<Double> y2List = new ArrayList<Double>();
 		
-		
 		xyGraph = new XYGraph();
-		
 		IEditorInput editorInput = getEditorInput();
 		FileStoreEditorInput fsInput = (FileStoreEditorInput)editorInput;
 		URI uri = fsInput.getURI();
@@ -95,6 +98,7 @@ public class ChartEditor extends EditorPart{
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
 			String line = br.readLine();
+			String temp = null;
 			StringTokenizer st = new StringTokenizer(line, ",");
 			xyGraph.getXAxisList().get(0).setTitle(st.nextToken());
 			xyGraph.getYAxisList().get(0).setTitle(st.nextToken());
@@ -121,7 +125,7 @@ public class ChartEditor extends EditorPart{
 		
 		for(i = 0 ; i < xList.size() ; i++)
 			xValue[i] = xList.get(i);
-		
+			
 		
 		for(i = 0 ; i < yList.size() ; i++)
 			yValue[i] = yList.get(i);
@@ -142,8 +146,6 @@ public class ChartEditor extends EditorPart{
 		traceDataProvider2.setCurrentYDataArray(y2Value);
 		Trace trace2 = new Trace(xyGraph.getYAxisList().get(0).getTitle() + " 2", xyGraph.primaryXAxis, xyGraph.primaryYAxis, traceDataProvider2);			
 		trace2.setPointStyle(PointStyle.CROSS);
-		
-		
 		xyGraph.addTrace(trace);
 		xyGraph.addTrace(trace2);
 		xyGraph.performAutoScale();
@@ -202,5 +204,9 @@ public class ChartEditor extends EditorPart{
 	@Override
 	public void setFocus() {
 		canvas.setFocus();
+	}
+	
+	public XYGraph getXYGraph(){
+		return xyGraph;
 	}
 }

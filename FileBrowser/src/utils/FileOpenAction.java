@@ -19,7 +19,6 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 
 import editors.ChartEditor;
 import editors.ImageEditor;
-import editors.MyGraphicalEditor;
 import editors.MyTextEditor;
 import views.BrowserView;
 
@@ -57,7 +56,6 @@ public class FileOpenAction extends Action implements IWorkbenchAction {
 
 		try {
 			if (file.isDirectory()) {
-				page.openEditor(fileStoreEditorInput, MyGraphicalEditor.ID);
 				if(tv.getExpandedState(file))
 					tv.setExpandedState(file, false);
 				
