@@ -50,7 +50,7 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 		event.feedback = DND.FEEDBACK_NONE;
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings({ "unused", "resource" })
 	@Override
 	public void drop(DropTargetEvent event) {
 		System.out.println(">>>>>>>> Dropped");
@@ -66,8 +66,10 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 			if((window.getActivePage().getActiveEditor() instanceof ChartEditor) && editorId.equals(ChartEditor.ID)){
 				XYGraph xyg = ((ChartEditor) window.getActivePage().getActiveEditor()).getXYGraph();
 				
-				if(input.getName().equals(xyg.getTitle()))
+				if(input.getName().equals(xyg.getTitle())){
+					System.out.println("Already Opened.");
 					return;
+				}
 				
 				FileStoreEditorInput fsInput = (FileStoreEditorInput) input;
 				
@@ -90,6 +92,13 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 					xTitle = st.nextToken();
 					yTitle = st.nextToken();
 					
+					for(Trace t : xyg.getPlotArea().getTraceList()){
+						if(t.getName().equals(file.getName() + " - " + yTitle)){
+							System.out.println("Already added");
+							return;
+						}
+					}
+									
 					while((line = br.readLine()) != null){
 						st = new StringTokenizer(line, ",");
 						x = Double.parseDouble(st.nextToken());

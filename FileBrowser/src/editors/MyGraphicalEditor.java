@@ -219,7 +219,7 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 			
 			@Override
 			public void focusLost(FocusEvent e) {
-				
+				olv.getCanvas().redraw();
 			}
 		});
 		
@@ -263,7 +263,6 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 				
 			}
 		});
-		graph.setFocus();
 	}
 
 	@Override
@@ -299,5 +298,10 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 		olv.getCanvas().redraw();
 		olv.getTableViewer().setInput(fileModelList);
 		olv.getTableViewer().refresh();
+	}
+	
+	@Override
+	public void setFocus(){
+		graph.setFocus();
 	}
 }
