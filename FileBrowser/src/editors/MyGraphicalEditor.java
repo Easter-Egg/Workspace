@@ -10,6 +10,7 @@ import java.util.List;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.palette.PaletteRoot;
@@ -26,6 +27,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -124,6 +126,8 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 		
 		graph = new Graph(parent, SWT.NONE);
 		graph.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		
+		
 		
 		graph.addListener(SWT.Resize, new Listener() {
 			@Override
@@ -273,7 +277,6 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 	@Override
 	protected PaletteRoot getPaletteRoot() {
 		PaletteViewCreator pvc = new PaletteViewCreator();
-		
 		if(PALETTE_MODEL == null)
 			PALETTE_MODEL = pvc.createPaletteRoot();
 			

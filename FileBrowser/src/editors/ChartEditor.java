@@ -1,37 +1,55 @@
 package editors;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URI;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.draw2d.GridData;
-import org.eclipse.draw2d.KeyEvent;
-import org.eclipse.draw2d.KeyListener;
-import org.eclipse.draw2d.LightweightSystem;
-import org.eclipse.draw2d.MouseListener;
-import org.eclipse.nebula.visualization.xygraph.dataprovider.CircularBufferDataProvider;
-import org.eclipse.nebula.visualization.xygraph.figures.ToolbarArmedXYGraph;
-import org.eclipse.nebula.visualization.xygraph.figures.Trace;
-import org.eclipse.nebula.visualization.xygraph.figures.Trace.PointStyle;
 import org.eclipse.nebula.visualization.xygraph.figures.XYGraph;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DragDetectEvent;
+import org.eclipse.swt.events.DragDetectListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.EditorPart;
+import org.jfree.chart.ChartMouseEvent;
+import org.jfree.chart.ChartMouseListener;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYPointerAnnotation;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.entity.ChartEntity;
+import org.jfree.chart.entity.XYItemEntity;
+import org.jfree.chart.labels.StandardXYItemLabelGenerator;
+import org.jfree.chart.labels.XYItemLabelGenerator;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.experimental.chart.swt.ChartComposite;
+import org.jfree.ui.TextAnchor;
 
+import utils.FileModel;
+import views.TestOutlineView;
+
+@SuppressWarnings("unused")
 public class ChartEditor extends EditorPart{
 	public ChartEditor() {
 	}
@@ -39,7 +57,11 @@ public class ChartEditor extends EditorPart{
 	public static final String ID = "FileBrowser.chartEditor";
 	private Canvas canvas;
 	private XYGraph xyGraph;
-	// private String xTitle, yTitle;
+	private String xTitle, yTitle;
+	private ChartComposite cc;
+	private IWorkbenchPage page;
+	private TestOutlineView olv;
+	private List<FileModel> pointCoordinate;
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -67,72 +89,131 @@ public class ChartEditor extends EditorPart{
 	public void doSaveAs() {
 		
 	}
-	/*
+	
 	@SuppressWarnings("resource")
 	private XYSeriesCollection createDataset(File file) {  
 		final XYSeriesCollection result = new XYSeriesCollection();
-		
-		double x,y,y2;
-		
-		final XYSeries seriesY = new XYSeries("Y");
-		final XYSeries seriesY2 = new XYSeries("Y2");
+		double x,y = 0;
 		
 		try{
-			
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
 			String line = br.readLine();
 			StringTokenizer st = new StringTokenizer(line, ",");
 			xTitle = st.nextToken();
 			yTitle = st.nextToken();
+			final XYSeries seriesY = new XYSeries(file.getName() + " - " + yTitle);
 
 			while((line = br.readLine()) != null){
 				st = new StringTokenizer(line, ",");
 				x = Double.parseDouble(st.nextToken());
-				y = Double.parseDouble(st.nextToken());
-				y2 = Double.parseDouble(st.nextToken());
-				
+				while (st.hasMoreTokens()) {y = Double.parseDouble(st.nextToken()); }
 				seriesY.add(x, y);
-				seriesY2.add(x, y2);
 			}
-			
-		} catch (Exception e) {
-			
-		}
-		result.addSeries(seriesY);
-		result.addSeries(seriesY2);
+			result.addSeries(seriesY);
+		} catch (Exception e) { }
 		return result;  
 	}  
 	 
 	private JFreeChart createChart(final XYSeriesCollection dataset, final String title) {
 		final XYItemRenderer renderer1 = new StandardXYItemRenderer();
+		renderer1.setSeriesPaint(0, null);
 		final ValueAxis domainAxis = new NumberAxis("Max Value");
 		final ValueAxis rangeAxis = new NumberAxis("GC Time");
 		final XYPlot plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer1);
-		final XYTextAnnotation annotation = new XYTextAnnotation("Hello!", 500.0, 0.005);
-		plot.addAnnotation(annotation);
-		JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 		
+		NumberFormat format = NumberFormat.getNumberInstance();
+	    format.setMaximumFractionDigits(4);
+		XYItemLabelGenerator generator = new StandardXYItemLabelGenerator(
+				StandardXYItemLabelGenerator.DEFAULT_ITEM_LABEL_FORMAT,
+	                format, format);
+		
+		renderer1.setBaseItemLabelGenerator(generator);
+	    renderer1.setBaseItemLabelsVisible(true);
+	    
+		double annoX = Double.parseDouble(dataset.getX(0, 4).toString());
+		double annoY = Double.parseDouble(dataset.getY(0, 4).toString());
+		String label = "("+ annoX + ", " + annoY + ")";
+		final XYPointerAnnotation pointer = new XYPointerAnnotation(label, annoX, annoY, 3.0 * Math.PI / 4.0);
+		
+		pointer.setBaseRadius(45.0);
+	    pointer.setTipRadius(5.0);
+	    pointer.setPaint(Color.blue);
+	    pointer.setLabelOffset(10.0);
+	    pointer.setTextAnchor(TextAnchor.HALF_ASCENT_RIGHT);
+	    
+	    plot.addAnnotation(pointer);
+	    
+		JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 		return chart;  
-	}  */
+	} 
 
-	@SuppressWarnings({ "resource", "unused"})
 	@Override
 	public void createPartControl(Composite parent) {
-		/*
+		
+		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
+		Random r = new Random(10);
 		IEditorInput editorInput = getEditorInput();
 		FileStoreEditorInput fsInput = (FileStoreEditorInput)editorInput;
 		URI uri = fsInput.getURI();
 		File file = new File(uri);
 		
+		pointCoordinate = new ArrayList<FileModel>();
+		
 		final XYSeriesCollection dataset = createDataset(file);  
 		final JFreeChart chart = createChart(dataset, file.getName());
 		
-		ChartComposite cc = new ChartComposite(parent, SWT.NONE, chart, true);
-		
-		
-		System.out.println(chart.getXYPlot().getAnnotations());*/
-		
+		cc = new ChartComposite(parent, SWT.NONE, chart, true);
+		cc.addChartMouseListener(new ChartMouseListener(){
+
+			@Override
+			public void chartMouseClicked(ChartMouseEvent arg0) {
+				XYPointerAnnotation anno = ((XYPointerAnnotation) arg0.getChart().getXYPlot().getAnnotations().get(0));
+				ChartEntity entity = arg0.getEntity();
+				pointCoordinate.clear();
+				if (entity != null && (entity instanceof XYItemEntity)) {
+	                XYItemEntity item = (XYItemEntity) entity;
+	                double xValue = item.getDataset().getXValue(item.getSeriesIndex(), item.getItem());
+	                double yValue = item.getDataset().getYValue(item.getSeriesIndex(), item.getItem());
+	                String text = "("+ xValue + ", " + yValue + ")";
+	                anno.setAngle(r.nextDouble() *  Math.PI / r.nextDouble());
+	                anno.setText(text);
+	                anno.setX(xValue);
+	                anno.setY(yValue);
+	                
+	                pointCoordinate.add(new FileModel("X", xValue+""));
+	                pointCoordinate.add(new FileModel("Y", yValue+""));
+	                olv.getTableViewer().setInput(pointCoordinate);
+					olv.getTableViewer().refresh();
+				}
+			}
+
+			@Override
+			public void chartMouseMoved(ChartMouseEvent arg0) {
+				// TODO Auto-generated method stub
+			}
+			
+		});
+		cc.addMouseWheelListener(new MouseWheelListener(){
+
+			@Override
+			public void mouseScrolled(MouseEvent e) {
+				if (( e.stateMask & SWT.CTRL ) == 0)
+	                    return; 
+				 
+				if (e.count > 0) {
+					System.out.println("Zoom in");
+					cc.zoomInBoth(e.x, e.y);
+				} else if (e.count < 0) {
+					System.out.println("Zoom out");
+					cc.zoomOutBoth(e.x, e.y);
+				}
+			}
+			
+		});
+	}
+		/*
 		canvas = new Canvas(parent, SWT.BORDER);
 		canvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
@@ -204,55 +285,30 @@ public class ChartEditor extends EditorPart{
 			}
 		});
 		
-		xyGraph.addKeyListener(new KeyListener.Stub() {
-			@Override
-			public void keyPressed(final KeyEvent ke) {
-				if((ke.getState() == SWT.CONTROL) && (ke.keycode == 's')) {
-					final ImageLoader loader = new ImageLoader();
-					loader.data = new ImageData[] { xyGraph.getImage().getImageData() };
-					final FileDialog dialog = new FileDialog(Display.getDefault().getShells()[0], SWT.SAVE);
-					dialog.setFilterNames(new String[] { "PNG Files", "All Files (*.*)" });
-					dialog.setFilterExtensions(new String[] { "*.png", "*.*" });
-					final String path = dialog.open();
-					if ((path != null) && !path.equals("")) {
-						loader.save(path, SWT.IMAGE_PNG);
-					}
-				}
-				
-				else if((ke.getState() == SWT.CONTROL) && (ke.keycode == 'r')) {
-					xyGraph.performAutoScale();
-				}
-			}
-		});
-		
-		canvas.addMouseWheelListener(new MouseWheelListener(){
-
-			@Override
-			public void mouseScrolled(org.eclipse.swt.events.MouseEvent e) {
-				if((e.stateMask & SWT.CTRL) == 0)
-					return;
-				
-				if(e.count > 0){
-					xyGraph.getPlotArea().zoomInOut(true, true, e.x, e.y, e.count * 0.1 / 3);
-				}
-				
-				if(e.count < 0){
-					xyGraph.getPlotArea().zoomInOut(true, true, e.x, e.y, e.count * 0.1 / 3);
-				}
-			}
-		});
-		
+		xyGraph.addKeyListener(keyListener);
+		canvas.addMouseWheelListener(mouseWheelListener);
 		ToolbarArmedXYGraph toolbarArmedXYGraph = new ToolbarArmedXYGraph(xyGraph);
 		toolbarArmedXYGraph.getToolbar().addSeparator();
 		lws.setContents(toolbarArmedXYGraph);
-	}
+	}*/
 
 	@Override
 	public void setFocus() {
-		canvas.setFocus();
+		//canvas.setFocus();
+		cc.setFocus();
 	}
 	
-	public XYGraph getXYGraph(){
-		return xyGraph;
+	public ChartComposite getXYGraph(){
+		//return xyGraph;
+		return cc;
+	}
+	
+	@Override
+	public void dispose(){
+		//canvas.removeMouseWheelListener(mouseWheelListener);
+		//xyGraph.removeKeyListener(keyListener);
+		cc.getChart().getXYPlot().getAnnotations().clear();
+		pointCoordinate.clear();
+		olv.getTableViewer().refresh();
 	}
 }

@@ -3,13 +3,9 @@ package utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
+import java.text.NumberFormat;
 import java.util.StringTokenizer;
 
-import org.eclipse.nebula.visualization.xygraph.dataprovider.CircularBufferDataProvider;
-import org.eclipse.nebula.visualization.xygraph.figures.Trace;
-import org.eclipse.nebula.visualization.xygraph.figures.Trace.PointStyle;
-import org.eclipse.nebula.visualization.xygraph.figures.XYGraph;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
@@ -18,6 +14,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.EditorInputTransfer;
+import org.jfree.chart.labels.StandardXYItemLabelGenerator;
+import org.jfree.chart.labels.XYItemLabelGenerator;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.experimental.chart.swt.ChartComposite;
 
 import editors.ChartEditor;
 
@@ -50,7 +52,6 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 		event.feedback = DND.FEEDBACK_NONE;
 	}
 
-	@SuppressWarnings({ "unused", "resource" })
 	@Override
 	public void drop(DropTargetEvent event) {
 		System.out.println(">>>>>>>> Dropped");
@@ -64,15 +65,30 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 			String editorId = editorInputs[0].editorId;
 			
 			if((window.getActivePage().getActiveEditor() instanceof ChartEditor) && editorId.equals(ChartEditor.ID)){
-				XYGraph xyg = ((ChartEditor) window.getActivePage().getActiveEditor()).getXYGraph();
+				//XYGraph xyg = ((ChartEditor) window.getActivePage().getActiveEditor()).getXYGraph();
+				ChartComposite cc =((ChartEditor) window.getActivePage().getActiveEditor()).getXYGraph();
 				
-				if(input.getName().equals(xyg.getTitle())){
+				if(input.getName().equals(cc.getChart().getTitle())){
 					System.out.println("Already Opened.");
 					return;
 				}
 				
 				FileStoreEditorInput fsInput = (FileStoreEditorInput) input;
+				File file = new File(fsInput.getURI());
+				cc.getChart().getXYPlot().setDataset(cc.getChart().getXYPlot().getDatasetCount(), createDataset(file));
+				XYLineAndShapeRenderer renderer0 = new XYLineAndShapeRenderer();
+				renderer0.setSeriesPaint(0, null);
+				NumberFormat format = NumberFormat.getNumberInstance();
+			    format.setMaximumFractionDigits(4);
+				XYItemLabelGenerator generator = new StandardXYItemLabelGenerator(
+						StandardXYItemLabelGenerator.DEFAULT_ITEM_LABEL_FORMAT,
+			                format, format);
 				
+				renderer0.setBaseItemLabelGenerator(generator);
+			    renderer0.setBaseItemLabelsVisible(true);
+				cc.getChart().getXYPlot().setRenderer(cc.getChart().getXYPlot().getDatasetCount() - 1, renderer0);
+				
+				/*
 				int i = 0;
 				double x,y;
 				File file = new File(fsInput.getURI());
@@ -91,6 +107,7 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 					StringTokenizer st = new StringTokenizer(line, ",");
 					xTitle = st.nextToken();
 					yTitle = st.nextToken();
+					
 					
 					for(Trace t : xyg.getPlotArea().getTraceList()){
 						if(t.getName().equals(file.getName() + " - " + yTitle)){
@@ -132,9 +149,8 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 				trace.setPointStyle(PointStyle.TRIANGLE);
 				
 				xyg.addTrace(trace);
-				xyg.performAutoScale();				
+				xyg.performAutoScale();			*/	
 			}
-			
 			else{
 				try {
 					window.getActivePage().openEditor(input, editorId);
@@ -144,5 +160,35 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 			}
 		}
 		event.detail = DND.DROP_COPY;
+	}
+	
+	@SuppressWarnings({ "resource", "unused" })
+	private XYSeriesCollection createDataset(File file) {  
+		final XYSeriesCollection result = new XYSeriesCollection();
+		double x,y = 0;
+		
+		try{
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			String line = br.readLine();
+			StringTokenizer st = new StringTokenizer(line, ",");
+			String xTitle = st.nextToken();
+			String yTitle = st.nextToken();
+			
+			final XYSeries seriesY = new XYSeries(file.getName() + " - " + yTitle);
+
+			while((line = br.readLine()) != null){
+				st = new StringTokenizer(line, ",");
+				x = Double.parseDouble(st.nextToken());
+				while (st.hasMoreTokens()) {y = Double.parseDouble(st.nextToken()); }
+				seriesY.add(x, y);
+			}
+			
+			result.addSeries(seriesY);
+		} catch (Exception e) {
+			
+		}
+		
+		return result;  
 	}
 }
