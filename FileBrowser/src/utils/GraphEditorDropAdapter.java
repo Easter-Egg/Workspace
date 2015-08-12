@@ -44,7 +44,6 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 
 	@Override
 	public void dragLeave(DropTargetEvent event) {
-		System.out.println(">>>>>>>> Drag Leave");
 	}
 
 	@Override
@@ -54,8 +53,6 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 
 	@Override
 	public void drop(DropTargetEvent event) {
-		System.out.println(">>>>>>>> Dropped");
-		
 		if(EditorInputTransfer.getInstance().isSupportedType(event.currentDataType)){
 			if(event.data == null)
 				return;
@@ -65,17 +62,25 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 			String editorId = editorInputs[0].editorId;
 			
 			if((window.getActivePage().getActiveEditor() instanceof ChartEditor) && editorId.equals(ChartEditor.ID)){
-				//XYGraph xyg = ((ChartEditor) window.getActivePage().getActiveEditor()).getXYGraph();
 				ChartComposite cc =((ChartEditor) window.getActivePage().getActiveEditor()).getXYGraph();
 				
-				if(input.getName().equals(cc.getChart().getTitle())){
+				FileStoreEditorInput fsInput = (FileStoreEditorInput) input;
+				File file = new File(fsInput.getURI());
+				XYSeriesCollection addedSeries = createDataset(file);
+				
+				if(file.getName().equals(cc.getChart().getTitle())){
 					System.out.println("Already Opened.");
 					return;
 				}
 				
-				FileStoreEditorInput fsInput = (FileStoreEditorInput) input;
-				File file = new File(fsInput.getURI());
-				cc.getChart().getXYPlot().setDataset(cc.getChart().getXYPlot().getDatasetCount(), createDataset(file));
+				for(int i = 0 ; i < cc.getChart().getXYPlot().getDatasetCount() ; i++){
+					if(cc.getChart().getXYPlot().getDataset(i).equals(addedSeries)){
+						System.out.println("Already added.");
+						return;
+					}
+				}
+				
+				cc.getChart().getXYPlot().setDataset(cc.getChart().getXYPlot().getDatasetCount(), addedSeries);
 				XYLineAndShapeRenderer renderer0 = new XYLineAndShapeRenderer();
 				renderer0.setSeriesPaint(0, null);
 				NumberFormat format = NumberFormat.getNumberInstance();
@@ -87,69 +92,6 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 				renderer0.setBaseItemLabelGenerator(generator);
 			    renderer0.setBaseItemLabelsVisible(true);
 				cc.getChart().getXYPlot().setRenderer(cc.getChart().getXYPlot().getDatasetCount() - 1, renderer0);
-				
-				/*
-				int i = 0;
-				double x,y;
-				File file = new File(fsInput.getURI());
-				String xTitle = null;
-				String yTitle = null;
-				
-				FileReader fr;
-				BufferedReader br;
-				
-				ArrayList<Double> xList = new ArrayList<Double>();
-				ArrayList<Double> yList = new ArrayList<Double>();
-				try {
-					fr = new FileReader(file);
-					br = new BufferedReader(fr);
-					String line = br.readLine();
-					StringTokenizer st = new StringTokenizer(line, ",");
-					xTitle = st.nextToken();
-					yTitle = st.nextToken();
-					
-					
-					for(Trace t : xyg.getPlotArea().getTraceList()){
-						if(t.getName().equals(file.getName() + " - " + yTitle)){
-							System.out.println("Already added");
-							return;
-						}
-					}
-									
-					while((line = br.readLine()) != null){
-						st = new StringTokenizer(line, ",");
-						x = Double.parseDouble(st.nextToken());
-						y = Double.parseDouble(st.nextToken());
-						
-						xList.add(x);
-						yList.add(y);
-						i++;
-					}
-			
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				double xValue[] = new double[xList.size()];
-				double yValue[] = new double[yList.size()];
-				
-				for(i = 0 ; i < xList.size() ; i++)
-					xValue[i] = xList.get(i);
-					
-				
-				for(i = 0 ; i < yList.size() ; i++)
-					yValue[i] = yList.get(i);
-				
-				
-				CircularBufferDataProvider traceDataProvider = new CircularBufferDataProvider(false);
-				traceDataProvider.setBufferSize(i);		
-				traceDataProvider.setCurrentXDataArray(xValue);
-				traceDataProvider.setCurrentYDataArray(yValue);
-				Trace trace = new Trace(file.getName() + " - " + yTitle, xyg.primaryXAxis, xyg.primaryYAxis, traceDataProvider);			
-				trace.setPointStyle(PointStyle.TRIANGLE);
-				
-				xyg.addTrace(trace);
-				xyg.performAutoScale();			*/	
 			}
 			else{
 				try {
@@ -175,12 +117,12 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 			String xTitle = st.nextToken();
 			String yTitle = st.nextToken();
 			
-			final XYSeries seriesY = new XYSeries(file.getName() + " - " + yTitle);
+			final XYSeries seriesY = new XYSeries(yTitle + "(" + file.getName() + ")");
 
 			while((line = br.readLine()) != null){
 				st = new StringTokenizer(line, ",");
 				x = Double.parseDouble(st.nextToken());
-				while (st.hasMoreTokens()) {y = Double.parseDouble(st.nextToken()); }
+				while (st.hasMoreTokens()) { y = Double.parseDouble(st.nextToken()); }
 				seriesY.add(x, y);
 			}
 			

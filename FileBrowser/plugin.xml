@@ -143,6 +143,16 @@
             id="FileBrowser.command.gridLayoutAlgorithm"
             name="Grid Layout Algorithm">
       </command>
+      <command
+            defaultHandler="handlers.ChartStyleChangeHandler"
+            id="FileBrowser.command.CSC"
+            name="Style Change">
+      </command>
+      <command
+            defaultHandler="handlers.TickUnitChangeHandler"
+            id="FileBrowser.command.TUCD"
+            name="Tick Unit Change">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -273,6 +283,28 @@
          <command
                commandId="FileBrowser.command.zoomOut"
                icon="icons/ZoomOut.ico"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:FileBrowser.ChartEditor">
+         <command
+               commandId="FileBrowser.command.About"
+               icon="icons/folder.png"
+               label="About"
+               style="push">
+         </command>
+         <command
+               commandId="FileBrowser.command.CSC"
+               icon="icons/zoomin.png"
+               label="Style Change"
+               style="push">
+         </command>
+         <command
+               commandId="FileBrowser.command.TUCD"
+               icon="icons/favicon.ico"
+               id="Tick Unit"
                style="push">
          </command>
       </menuContribution>

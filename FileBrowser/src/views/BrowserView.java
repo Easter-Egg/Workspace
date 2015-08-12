@@ -42,7 +42,7 @@ public class BrowserView extends ViewPart {
 	private Tree tree;
 	public static final String ID = "FileBrowser.browserView";
 	
-	private IDoubleClickListener l = new IDoubleClickListener() {
+	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
 		
 		@Override
 		public void doubleClick(DoubleClickEvent event) {
@@ -86,7 +86,7 @@ public class BrowserView extends ViewPart {
 		getSite().registerContextMenu(menuManager, treeViewer);
 		
 		getSite().setSelectionProvider(treeViewer);
-		treeViewer.addDoubleClickListener(l);
+		treeViewer.addDoubleClickListener(doubleClickListener);
 		initDragAndDrop(treeViewer);
 	}
 	
@@ -131,7 +131,6 @@ public class BrowserView extends ViewPart {
 
 			@Override
 			public void dragFinished(DragSourceEvent event) {
-				System.out.println("Drag Finished");
 			}
 		};
 		viewer.addDragSupport(operations, transferTypes, DragListener);
@@ -145,7 +144,7 @@ public class BrowserView extends ViewPart {
 	@Override
 	public void dispose() {
 		super.dispose();
-		treeViewer.removeDoubleClickListener(l);
+		treeViewer.removeDoubleClickListener(doubleClickListener);
 	}
 	
 	public TreeViewer getTreeViewer(){

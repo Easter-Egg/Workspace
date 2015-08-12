@@ -12,40 +12,41 @@ import java.util.Random;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.nebula.visualization.xygraph.figures.XYGraph;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DragDetectEvent;
-import org.eclipse.swt.events.DragDetectListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.EditorPart;
 import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
 import org.jfree.chart.labels.StandardXYItemLabelGenerator;
 import org.jfree.chart.labels.XYItemLabelGenerator;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.experimental.chart.swt.ChartComposite;
 import org.jfree.ui.TextAnchor;
 
+import utils.ChartCompositeWithKeyListener;
 import utils.FileModel;
 import views.TestOutlineView;
 
@@ -62,6 +63,39 @@ public class ChartEditor extends EditorPart{
 	private IWorkbenchPage page;
 	private TestOutlineView olv;
 	private List<FileModel> pointCoordinate;
+	private Random r = new Random(10);
+	private ToolBarManager tm;
+	
+	private ChartMouseListener chartMouseListener = new ChartMouseListener(){
+
+		@Override
+		public void chartMouseClicked(ChartMouseEvent arg0) {
+			XYPointerAnnotation anno = ((XYPointerAnnotation) arg0.getChart().getXYPlot().getAnnotations().get(0));
+			ChartEntity entity = arg0.getEntity();
+			pointCoordinate.clear();
+			if (entity != null && (entity instanceof XYItemEntity)) {
+                XYItemEntity item = (XYItemEntity) entity;
+                double xValue = item.getDataset().getXValue(item.getSeriesIndex(), item.getItem());
+                double yValue = item.getDataset().getYValue(item.getSeriesIndex(), item.getItem());
+                String text = "("+ xValue + ", " + yValue + ")";
+                anno.setAngle(r.nextDouble() *  Math.PI / r.nextDouble());
+                anno.setText(text);
+                anno.setX(xValue);
+                anno.setY(yValue);
+                
+                pointCoordinate.add(new FileModel("X", xValue+""));
+                pointCoordinate.add(new FileModel("Y", yValue+""));
+                olv.getTableViewer().setInput(pointCoordinate);
+				olv.getTableViewer().refresh();
+			}
+		}
+
+		@Override
+		public void chartMouseMoved(ChartMouseEvent arg0) {
+		}
+		
+	};
+	
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -102,7 +136,7 @@ public class ChartEditor extends EditorPart{
 			StringTokenizer st = new StringTokenizer(line, ",");
 			xTitle = st.nextToken();
 			yTitle = st.nextToken();
-			final XYSeries seriesY = new XYSeries(file.getName() + " - " + yTitle);
+			final XYSeries seriesY = new XYSeries(yTitle + "(" + file.getName() + ")");
 
 			while((line = br.readLine()) != null){
 				st = new StringTokenizer(line, ",");
@@ -112,14 +146,16 @@ public class ChartEditor extends EditorPart{
 			}
 			result.addSeries(seriesY);
 		} catch (Exception e) { }
+		
 		return result;  
 	}  
 	 
 	private JFreeChart createChart(final XYSeriesCollection dataset, final String title) {
-		final XYItemRenderer renderer1 = new StandardXYItemRenderer();
+		final XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer();
 		renderer1.setSeriesPaint(0, null);
-		final ValueAxis domainAxis = new NumberAxis("Max Value");
-		final ValueAxis rangeAxis = new NumberAxis("GC Time");
+		renderer1.setSeriesLinesVisible(0, false);
+		final NumberAxis domainAxis = new NumberAxis("Max Value");
+		final NumberAxis rangeAxis = new NumberAxis("GC Time");
 		final XYPlot plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer1);
 		
 		NumberFormat format = NumberFormat.getNumberInstance();
@@ -131,8 +167,8 @@ public class ChartEditor extends EditorPart{
 		renderer1.setBaseItemLabelGenerator(generator);
 	    renderer1.setBaseItemLabelsVisible(true);
 	    
-		double annoX = Double.parseDouble(dataset.getX(0, 4).toString());
-		double annoY = Double.parseDouble(dataset.getY(0, 4).toString());
+		double annoX = Double.parseDouble(dataset.getX(0, 5).toString());
+		double annoY = Double.parseDouble(dataset.getY(0, 5).toString());
 		String label = "("+ annoX + ", " + annoY + ")";
 		final XYPointerAnnotation pointer = new XYPointerAnnotation(label, annoX, annoY, 3.0 * Math.PI / 4.0);
 		
@@ -143,17 +179,25 @@ public class ChartEditor extends EditorPart{
 	    pointer.setTextAnchor(TextAnchor.HALF_ASCENT_RIGHT);
 	    
 	    plot.addAnnotation(pointer);
-	    
+
 		JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+	    plot.setDomainPannable(true);
+	    plot.setRangePannable(true);
 		return chart;  
 	} 
 
 	@Override
 	public void createPartControl(Composite parent) {
 		
+		parent.setLayout(new GridLayout(1, false));
+		ToolBar toolbar = new ToolBar(parent, SWT.None);
+		toolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		ToolBarManager tm = new ToolBarManager(toolbar);
+		this.tm = tm;		
+		((IMenuService) getEditorSite().getService(IMenuService.class)).populateContributionManager(tm, "toolbar:FileBrowser.ChartEditor");
+		
 		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
-		Random r = new Random(10);
 		IEditorInput editorInput = getEditorInput();
 		FileStoreEditorInput fsInput = (FileStoreEditorInput)editorInput;
 		URI uri = fsInput.getURI();
@@ -163,152 +207,27 @@ public class ChartEditor extends EditorPart{
 		
 		final XYSeriesCollection dataset = createDataset(file);  
 		final JFreeChart chart = createChart(dataset, file.getName());
-		
-		cc = new ChartComposite(parent, SWT.NONE, chart, true);
-		cc.addChartMouseListener(new ChartMouseListener(){
-
-			@Override
-			public void chartMouseClicked(ChartMouseEvent arg0) {
-				XYPointerAnnotation anno = ((XYPointerAnnotation) arg0.getChart().getXYPlot().getAnnotations().get(0));
-				ChartEntity entity = arg0.getEntity();
-				pointCoordinate.clear();
-				if (entity != null && (entity instanceof XYItemEntity)) {
-	                XYItemEntity item = (XYItemEntity) entity;
-	                double xValue = item.getDataset().getXValue(item.getSeriesIndex(), item.getItem());
-	                double yValue = item.getDataset().getYValue(item.getSeriesIndex(), item.getItem());
-	                String text = "("+ xValue + ", " + yValue + ")";
-	                anno.setAngle(r.nextDouble() *  Math.PI / r.nextDouble());
-	                anno.setText(text);
-	                anno.setX(xValue);
-	                anno.setY(yValue);
-	                
-	                pointCoordinate.add(new FileModel("X", xValue+""));
-	                pointCoordinate.add(new FileModel("Y", yValue+""));
-	                olv.getTableViewer().setInput(pointCoordinate);
-					olv.getTableViewer().refresh();
-				}
-			}
-
-			@Override
-			public void chartMouseMoved(ChartMouseEvent arg0) {
-				// TODO Auto-generated method stub
-			}
-			
-		});
-		cc.addMouseWheelListener(new MouseWheelListener(){
-
-			@Override
-			public void mouseScrolled(MouseEvent e) {
-				if (( e.stateMask & SWT.CTRL ) == 0)
-	                    return; 
-				 
-				if (e.count > 0) {
-					System.out.println("Zoom in");
-					cc.zoomInBoth(e.x, e.y);
-				} else if (e.count < 0) {
-					System.out.println("Zoom out");
-					cc.zoomOutBoth(e.x, e.y);
-				}
-			}
-			
-		});
+		cc = new ChartCompositeWithKeyListener(parent, SWT.NONE, chart, true);
+		cc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		cc.setHorizontalAxisTrace(true);
+		cc.setVerticalAxisTrace(true);
+		cc.addChartMouseListener(chartMouseListener);
 	}
-		/*
-		canvas = new Canvas(parent, SWT.BORDER);
-		canvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-
-		final LightweightSystem lws = new LightweightSystem(canvas);
-		int i = 0;
-		double x,y;
-		
-		ArrayList<Double> xList = new ArrayList<Double>();
-		ArrayList<Double> yList = new ArrayList<Double>();
-		
-		xyGraph = new XYGraph();
-		IEditorInput editorInput = getEditorInput();
-		FileStoreEditorInput fsInput = (FileStoreEditorInput)editorInput;
-		URI uri = fsInput.getURI();
-		File file = new File(uri);
-		xyGraph.setTitle(file.getName());
-		
-		try {
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String line = br.readLine();
-			String temp = null;
-			StringTokenizer st = new StringTokenizer(line, ",");
-			xyGraph.getXAxisList().get(0).setTitle(st.nextToken());
-			xyGraph.getYAxisList().get(0).setTitle(st.nextToken());
-			
-			while((line = br.readLine()) != null){
-				st = new StringTokenizer(line, ",");
-				x = Double.parseDouble(st.nextToken());
-				y = Double.parseDouble(st.nextToken());
-				
-				xList.add(x);
-				yList.add(y);
-				i++;
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		double xValue[] = new double[xList.size()];
-		double yValue[] = new double[yList.size()];
-		
-		for(i = 0 ; i < xList.size() ; i++)
-			xValue[i] = xList.get(i);
-		
-		for(i = 0 ; i < yList.size() ; i++)
-			yValue[i] = yList.get(i);
-		
-		
-		CircularBufferDataProvider traceDataProvider = new CircularBufferDataProvider(false);
-		traceDataProvider.setBufferSize(i);		
-		traceDataProvider.setCurrentXDataArray(xValue);
-		traceDataProvider.setCurrentYDataArray(yValue);
-		Trace trace = new Trace(xyGraph.getYAxisList().get(0).getTitle(), xyGraph.primaryXAxis, xyGraph.primaryYAxis, traceDataProvider);			
-		trace.setPointStyle(PointStyle.CIRCLE);
-		trace.setLineWidth(4);
-		trace.setPointSize(10);
-
-		xyGraph.addTrace(trace);
-		xyGraph.performAutoScale();
-		xyGraph.setFocusTraversable(true);
-		xyGraph.setRequestFocusEnabled(true);
-		
-		xyGraph.getPlotArea().addMouseListener(new MouseListener.Stub() {
-			@Override
-			public void mousePressed(org.eclipse.draw2d.MouseEvent me) {
-				xyGraph.requestFocus();
-			}
-		});
-		
-		xyGraph.addKeyListener(keyListener);
-		canvas.addMouseWheelListener(mouseWheelListener);
-		ToolbarArmedXYGraph toolbarArmedXYGraph = new ToolbarArmedXYGraph(xyGraph);
-		toolbarArmedXYGraph.getToolbar().addSeparator();
-		lws.setContents(toolbarArmedXYGraph);
-	}*/
 
 	@Override
 	public void setFocus() {
-		//canvas.setFocus();
 		cc.setFocus();
 	}
 	
 	public ChartComposite getXYGraph(){
-		//return xyGraph;
 		return cc;
 	}
 	
 	@Override
 	public void dispose(){
-		//canvas.removeMouseWheelListener(mouseWheelListener);
-		//xyGraph.removeKeyListener(keyListener);
 		cc.getChart().getXYPlot().getAnnotations().clear();
 		pointCoordinate.clear();
 		olv.getTableViewer().refresh();
+		cc.removeChartMouseListener(chartMouseListener);
 	}
 }
