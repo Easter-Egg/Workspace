@@ -153,6 +153,26 @@
             id="FileBrowser.command.TUCD"
             name="Tick Unit Change">
       </command>
+      <command
+            defaultHandler="handlers.GetBestFitLineHandler"
+            id="FileBrowser.command.BestFit"
+            name="Get Best Fit">
+      </command>
+      <command
+            defaultHandler="handlers.AnnotationClearHandler"
+            id="FileBrowser.command.ClearAnno"
+            name="Clear Annotation">
+      </command>
+      <command
+            defaultHandler="handlers.RangeSetHandler"
+            id="FileBrowser.command.RangeSet"
+            name="Set Range">
+      </command>
+      <command
+            defaultHandler="handlers.SelectSeriesForAxisHandler"
+            id="FileBrowser.command.SelectSeries"
+            name="Select Series">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -305,6 +325,34 @@
                commandId="FileBrowser.command.TUCD"
                icon="icons/favicon.ico"
                id="Tick Unit"
+               style="push">
+         </command>
+         <command
+               commandId="FileBrowser.command.BestFit"
+               icon="icons/Layout.ico"
+               label="Best Fit"
+               style="push">
+         </command>
+         <command
+               commandId="FileBrowser.command.ClearAnno"
+               icon="icons/File.ico"
+               label="Clear Annotation"
+               style="push">
+         </command>
+         <separator
+               name="FileBrowser.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="FileBrowser.command.RangeSet"
+               icon="icons/Folder.ico"
+               label="Set Range"
+               style="push">
+         </command>
+         <command
+               commandId="FileBrowser.command.SelectSeries"
+               icon="icons/ZoomOut.ico"
+               label="Select Series For Axis"
                style="push">
          </command>
       </menuContribution>

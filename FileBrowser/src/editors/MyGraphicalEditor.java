@@ -128,7 +128,6 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 		graph.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
 		
-		
 		graph.addListener(SWT.Resize, new Listener() {
 			@Override
 			public void handleEvent(Event event) {

@@ -81,8 +81,7 @@ public class GraphEditorDropAdapter extends DropTargetAdapter {
 				}
 				
 				cc.getChart().getXYPlot().setDataset(cc.getChart().getXYPlot().getDatasetCount(), addedSeries);
-				XYLineAndShapeRenderer renderer0 = new XYLineAndShapeRenderer();
-				renderer0.setSeriesPaint(0, null);
+				XYLineAndShapeRenderer renderer0 = new XYLineAndShapeRenderer(false, true);
 				NumberFormat format = NumberFormat.getNumberInstance();
 			    format.setMaximumFractionDigits(4);
 				XYItemLabelGenerator generator = new StandardXYItemLabelGenerator(

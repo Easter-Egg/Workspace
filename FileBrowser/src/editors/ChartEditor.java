@@ -33,8 +33,6 @@ import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.NumberTickUnit;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
 import org.jfree.chart.labels.StandardXYItemLabelGenerator;
@@ -59,17 +57,24 @@ public class ChartEditor extends EditorPart{
 	private Canvas canvas;
 	private XYGraph xyGraph;
 	private String xTitle, yTitle;
+	private List<String> yTitles;
+	private List<XYSeries> seriesY;
 	private ChartComposite cc;
 	private IWorkbenchPage page;
 	private TestOutlineView olv;
 	private List<FileModel> pointCoordinate;
 	private Random r = new Random(10);
 	private ToolBarManager tm;
+	private XYPointerAnnotation pointer;
+	private XYPlot plot;
 	
 	private ChartMouseListener chartMouseListener = new ChartMouseListener(){
 
 		@Override
 		public void chartMouseClicked(ChartMouseEvent arg0) {
+			if(arg0.getChart().getXYPlot().getAnnotations().size() == 0)
+				plot.addAnnotation(pointer);
+			
 			XYPointerAnnotation anno = ((XYPointerAnnotation) arg0.getChart().getXYPlot().getAnnotations().get(0));
 			ChartEntity entity = arg0.getEntity();
 			pointCoordinate.clear();
@@ -124,10 +129,13 @@ public class ChartEditor extends EditorPart{
 		
 	}
 	
-	@SuppressWarnings("resource")
-	private XYSeriesCollection createDataset(File file) {  
+	@SuppressWarnings({ "resource" })
+	private XYSeriesCollection createDataset(File file) {
 		final XYSeriesCollection result = new XYSeriesCollection();
-		double x,y = 0;
+		double x = 0, y = 0;
+		int i = 0; 
+		yTitles = new ArrayList<String>();
+		seriesY = new ArrayList<XYSeries>();
 		
 		try{
 			FileReader fr = new FileReader(file);
@@ -135,28 +143,37 @@ public class ChartEditor extends EditorPart{
 			String line = br.readLine();
 			StringTokenizer st = new StringTokenizer(line, ",");
 			xTitle = st.nextToken();
-			yTitle = st.nextToken();
-			final XYSeries seriesY = new XYSeries(yTitle + "(" + file.getName() + ")");
-
+			
+			while(st.hasMoreTokens()) {
+				yTitles.add(st.nextToken() + " - " + file.getName());
+				seriesY.add(new XYSeries(yTitles.get(i)));
+				i++; 
+			}
+			
 			while((line = br.readLine()) != null){
+				i = 0 ;
 				st = new StringTokenizer(line, ",");
 				x = Double.parseDouble(st.nextToken());
-				while (st.hasMoreTokens()) {y = Double.parseDouble(st.nextToken()); }
-				seriesY.add(x, y);
+				while (st.hasMoreTokens()) {
+					y = Double.parseDouble(st.nextToken());
+					seriesY.get(i).add(x, y);
+					i++;
+				}
 			}
-			result.addSeries(seriesY);
+			
+			for(i = 0 ; i < seriesY.size() ; i++)
+				result.addSeries(seriesY.get(i));
+			
 		} catch (Exception e) { }
 		
 		return result;  
 	}  
 	 
 	private JFreeChart createChart(final XYSeriesCollection dataset, final String title) {
-		final XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer();
-		renderer1.setSeriesPaint(0, null);
-		renderer1.setSeriesLinesVisible(0, false);
-		final NumberAxis domainAxis = new NumberAxis("Max Value");
-		final NumberAxis rangeAxis = new NumberAxis("GC Time");
-		final XYPlot plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer1);
+		final XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer(false, true);
+		final NumberAxis domainAxis = new NumberAxis("X Axis");
+		final NumberAxis rangeAxis = new NumberAxis("Y Axis");
+		plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer1);
 		
 		NumberFormat format = NumberFormat.getNumberInstance();
 	    format.setMaximumFractionDigits(4);
@@ -170,7 +187,7 @@ public class ChartEditor extends EditorPart{
 		double annoX = Double.parseDouble(dataset.getX(0, 5).toString());
 		double annoY = Double.parseDouble(dataset.getY(0, 5).toString());
 		String label = "("+ annoX + ", " + annoY + ")";
-		final XYPointerAnnotation pointer = new XYPointerAnnotation(label, annoX, annoY, 3.0 * Math.PI / 4.0);
+		pointer = new XYPointerAnnotation(label, annoX, annoY, 3.0 * Math.PI / 4.0);
 		
 		pointer.setBaseRadius(45.0);
 	    pointer.setTipRadius(5.0);

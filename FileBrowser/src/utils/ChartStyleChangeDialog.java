@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -28,11 +29,9 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.util.ShapeUtilities;
 
 import editors.ChartEditor;
-import org.eclipse.swt.widgets.Button;
 
 public class ChartStyleChangeDialog extends Dialog {
 
-	private int seriesSelectedIndex;
 	private RGB colorValue;
 	private IWorkbenchPage page;
 	private ChartEditor ce;
@@ -42,6 +41,7 @@ public class ChartStyleChangeDialog extends Dialog {
 	private Color newColor;
 	private Shape shape;
 	private boolean lineVisible;
+	private String selectedSeries;
 	
 	public ChartStyleChangeDialog(Shell parent) {
 		super(parent);
@@ -52,7 +52,6 @@ public class ChartStyleChangeDialog extends Dialog {
 		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		ce = (ChartEditor) page.getActiveEditor();
 		plot = ce.getXYGraph().getChart().getXYPlot();
-		seriesSelectedIndex = 0;
 		
 		Composite container = (Composite) super.createDialogArea(parent);
 		GridLayout gridLayout = (GridLayout) container.getLayout();
@@ -65,8 +64,10 @@ public class ChartStyleChangeDialog extends Dialog {
 		Combo dataSetListCombo = new Combo(container, SWT.BORDER);
 		dataSetListCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
-		for(int i = 0 ; i < ce.getXYGraph().getChart().getXYPlot().getDatasetCount() ; i++){
-			dataSetListCombo.add(ce.getXYGraph().getChart().getXYPlot().getLegendItems().get(i).getLabel());
+		for(int j = 0 ; j < plot.getDatasetCount() ; j++){
+			for(int i = 0 ; i < plot.getDataset(j).getSeriesCount() ; i++){
+				dataSetListCombo.add(plot.getDataset(j).getSeriesKey(i).toString());
+			}
 		}
 		
 		
@@ -74,8 +75,7 @@ public class ChartStyleChangeDialog extends Dialog {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				seriesSelectedIndex = dataSetListCombo.getSelectionIndex();
-				renderer = (XYLineAndShapeRenderer) plot.getRenderer(seriesSelectedIndex);
+				selectedSeries = dataSetListCombo.getText();
 			}
 
 			@Override
@@ -126,6 +126,7 @@ public class ChartStyleChangeDialog extends Dialog {
 					stroke = new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 					        1.0f, new float[] {6.0f, 6.0f}, 0.0f);
 				}
+				
 			}
 
 			@Override
@@ -205,12 +206,28 @@ public class ChartStyleChangeDialog extends Dialog {
 	protected void buttonPressed(int buttonId) {
 		super.buttonPressed(buttonId);
 		if(buttonId == IDialogConstants.OK_ID){
+			
+			int dataSetIndex = 0;
+			int seriesIndex = 0;
+			
+			for(int j = 0 ; j < plot.getDatasetCount() ; j++){
+				for(int i = 0 ; i < plot.getDataset(j).getSeriesCount() ; i++){
+					if(selectedSeries.equals(plot.getDataset(j).getSeriesKey(i).toString())){
+						dataSetIndex = j; seriesIndex = i;
+					}
+				}
+			}
+
+			renderer = (XYLineAndShapeRenderer) plot.getRenderer(dataSetIndex);
+			
 			newColor = new Color(colorValue.red, colorValue.green, colorValue.blue);
-			renderer.setSeriesPaint(0, newColor);
-			renderer.setSeriesStroke(0, stroke);
-			renderer.setSeriesShape(0, shape);
+			renderer.setSeriesPaint(seriesIndex, newColor);
+			renderer.setSeriesStroke(seriesIndex, stroke);
+			renderer.setSeriesShape(seriesIndex, shape);
 			if(lineVisible)
-				renderer.setSeriesLinesVisible(0, true);
-		}
+				renderer.setSeriesLinesVisible(seriesIndex, true);
+			else
+				renderer.setSeriesLinesVisible(seriesIndex, false);
+			}
 	}
 }

@@ -25,7 +25,7 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 
 import editors.ImageEditor;
 import editors.MyTextEditor;
-import views.OutlineView;
+import views.TestOutlineView;
 
 public class FileOpenHandler extends AbstractHandler {
 
@@ -49,9 +49,10 @@ public class FileOpenHandler extends AbstractHandler {
 				page.openEditor(fileStoreEditorInput, MyTextEditor.ID, false);
 			}
 
-			if ((file.getName().endsWith(".jpg") || file.getName().endsWith(".png"))) {
-				page.openEditor(fileStoreEditorInput, ImageEditor.ID, false).getAdapter(OutlineView.class);
+			else if ((file.getName().endsWith(".jpg") || file.getName().endsWith(".png"))) {
+				page.openEditor(fileStoreEditorInput, ImageEditor.ID, false).getAdapter(TestOutlineView.class);
 			}
+			
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
