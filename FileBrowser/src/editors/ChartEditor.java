@@ -5,7 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URI;
-import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -28,17 +28,20 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.EditorPart;
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYPointerAnnotation;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
-import org.jfree.chart.labels.StandardXYItemLabelGenerator;
-import org.jfree.chart.labels.XYItemLabelGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.time.Second;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.experimental.chart.swt.ChartComposite;
@@ -67,6 +70,10 @@ public class ChartEditor extends EditorPart{
 	private ToolBarManager tm;
 	private XYPointerAnnotation pointer;
 	private XYPlot plot;
+	
+	// 스캐터 플랏 차트 데이터
+	// private static final int COUNT = 10000;
+	// private float[][] data = new float[2][COUNT];
 	
 	private ChartMouseListener chartMouseListener = new ChartMouseListener(){
 
@@ -129,8 +136,33 @@ public class ChartEditor extends EditorPart{
 		
 	}
 	
-	@SuppressWarnings({ "resource" })
+	/* 타임 시리즈 차트 데이터
+	private TimeSeriesCollection createDatasetForTime() {
+		
+		final TimeSeriesCollection dataset = new TimeSeriesCollection();
+        
+        final TimeSeries s1 = new TimeSeries("Series 1");
+        s1.add(new Second(0, 0, 14, 18, 8, 2015), 1.2);
+        s1.add(new Second(0, 10, 14, 18, 8, 2015), 3.0);
+        s1.add(new Second(0, 20, 14, 18, 8, 2015), 8.0);
+        
+        final TimeSeries s2 = new TimeSeries("Series 2");
+        s2.add(new Second(0, 0, 14, 18, 8, 2015), 10.0);
+        s2.add(new Second(0, 10, 14, 18, 8, 2015), 9.0);
+        s2.add(new Second(0, 20, 14, 18, 8, 2015), 9.5);
+        
+        dataset.addSeries(s1);
+        dataset.addSeries(s2);
+
+        return dataset;
+	}
+	*/
+	
+	@SuppressWarnings("resource")
 	private XYSeriesCollection createDataset(File file) {
+		
+		
+		long start = System.currentTimeMillis();
 		final XYSeriesCollection result = new XYSeriesCollection();
 		double x = 0, y = 0;
 		int i = 0; 
@@ -165,7 +197,8 @@ public class ChartEditor extends EditorPart{
 				result.addSeries(seriesY.get(i));
 			
 		} catch (Exception e) { }
-		
+		long end = System.currentTimeMillis();
+		System.out.println("createDataset() 수행시간 : " + (end - start) + "ms");
 		return result;  
 	}  
 	 
@@ -175,6 +208,7 @@ public class ChartEditor extends EditorPart{
 		final NumberAxis rangeAxis = new NumberAxis("Y Axis");
 		plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer1);
 		
+		/* Point label
 		NumberFormat format = NumberFormat.getNumberInstance();
 	    format.setMaximumFractionDigits(4);
 		XYItemLabelGenerator generator = new StandardXYItemLabelGenerator(
@@ -182,7 +216,7 @@ public class ChartEditor extends EditorPart{
 	                format, format);
 		
 		renderer1.setBaseItemLabelGenerator(generator);
-	    renderer1.setBaseItemLabelsVisible(true);
+	    renderer1.setBaseItemLabelsVisible(true);*/
 	    
 		double annoX = Double.parseDouble(dataset.getX(0, 5).toString());
 		double annoY = Double.parseDouble(dataset.getY(0, 5).toString());
@@ -201,11 +235,36 @@ public class ChartEditor extends EditorPart{
 	    plot.setDomainPannable(true);
 	    plot.setRangePannable(true);
 		return chart;  
-	} 
-
+	}
+	
+	/* 스캐터플랏 차트
+	public void FastScatterPlotChart(Composite parent){
+		populateData();
+		final NumberAxis domainAxis = new NumberAxis("X");
+        domainAxis.setAutoRangeIncludesZero(false);
+        final NumberAxis rangeAxis = new NumberAxis("Y");
+        rangeAxis.setAutoRangeIncludesZero(false);
+        final FastScatterPlot plot = new FastScatterPlot(this.data, domainAxis, rangeAxis);
+        final JFreeChart chart = new JFreeChart("Fast Scatter Plot", plot);
+        cc = new ChartCompositeWithKeyListener(parent, SWT.NONE, chart, true);
+        cc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+	}
+	
+	private void populateData() {
+		long start = System.currentTimeMillis();
+        for (int i = 0; i < this.data[0].length; i++) {
+            final float x = (float) i + 10000;
+            this.data[0][i] = x;
+            this.data[1][i] = 10000 + (float) Math.random() * COUNT;
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("데이터 생성 시간 : " + (end - start) + "ms");
+    }
+*/
+	
 	@Override
 	public void createPartControl(Composite parent) {
-		
+		long start = System.currentTimeMillis();
 		parent.setLayout(new GridLayout(1, false));
 		ToolBar toolbar = new ToolBar(parent, SWT.None);
 		toolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -222,13 +281,25 @@ public class ChartEditor extends EditorPart{
 		
 		pointCoordinate = new ArrayList<FileModel>();
 		
-		final XYSeriesCollection dataset = createDataset(file);  
-		final JFreeChart chart = createChart(dataset, file.getName());
+		
+		// 주석파트 - 타임 시리즈 차트
+		final XYSeriesCollection dataset = createDataset(file);
+		// final TimeSeriesCollection timeDataSet = createDatasetForTime();
+		// ChartFactory.createTimeSeriesChart(file.getName(), "Date", "Value", timeDataSet);
+		final JFreeChart chart = createChart(dataset, file.getName()); 
+				
+		// final DateAxis axis = (DateAxis) chart.getXYPlot().getDomainAxis();
+        // axis.setDateFormatOverride(new SimpleDateFormat("YY-MM-DD hh:mm:ss"));
+        
 		cc = new ChartCompositeWithKeyListener(parent, SWT.NONE, chart, true);
 		cc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		cc.setHorizontalAxisTrace(true);
 		cc.setVerticalAxisTrace(true);
 		cc.addChartMouseListener(chartMouseListener);
+		// FastScatterPlotChart(parent); 스캐터 플랏 차트
+		long end = System.currentTimeMillis();
+		
+		System.out.println("createPartControl() 수행시간 : " + (end - start) + "ms");
 	}
 
 	@Override
