@@ -67,6 +67,12 @@
             id="FileBrowser.myGraphicalEditor"
             name="MyGraphicalEditor">
       </editor>
+      <editor
+            class="editors.MultiChartEditor"
+            default="false"
+            id="FileBrowser.MultiChartEditor"
+            name="MultiChartEditor">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

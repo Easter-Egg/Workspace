@@ -70,6 +70,7 @@ public class ChartEditor extends EditorPart{
 	private ToolBarManager tm;
 	private XYPointerAnnotation pointer;
 	private XYPlot plot;
+	private XYSeriesCollection result;
 	
 	// 스캐터 플랏 차트 데이터
 	// private static final int COUNT = 10000;
@@ -163,7 +164,7 @@ public class ChartEditor extends EditorPart{
 		
 		
 		long start = System.currentTimeMillis();
-		final XYSeriesCollection result = new XYSeriesCollection();
+		result = new XYSeriesCollection();
 		double x = 0, y = 0;
 		int i = 0; 
 		yTitles = new ArrayList<String>();
@@ -317,5 +318,9 @@ public class ChartEditor extends EditorPart{
 		pointCoordinate.clear();
 		olv.getTableViewer().refresh();
 		cc.removeChartMouseListener(chartMouseListener);
+	}
+	
+	public XYSeriesCollection getXYSeriesCollection(){
+		return result;
 	}
 }

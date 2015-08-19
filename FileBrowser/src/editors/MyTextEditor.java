@@ -114,7 +114,7 @@ public class MyTextEditor extends EditorPart {
 	}
 
 	private String readFileContents() {
-		FileStoreEditorInput fsInput = (FileStoreEditorInput)getEditorInput();
+		FileStoreEditorInput fsInput = (FileStoreEditorInput) getEditorInput();
 		URI uri = fsInput.getURI();
 		File file = new File(uri);
 		StringBuffer buffer = new StringBuffer();
