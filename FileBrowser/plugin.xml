@@ -203,6 +203,11 @@
                   style="push"
                   tooltip="Popup dialog">
             </command>
+            <command
+                  commandId="org.eclipse.ui.window.preferences"
+                  label="Custom preferences"
+                  style="push">
+            </command>
          </menu>
       </menuContribution>
       <menuContribution
@@ -399,6 +404,14 @@
             </with>
          </enabledWhen> 
       </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="utils.CustomPreferencePage"
+            id="FileBrowser.page.CustomPreferencePage"
+            name="Custom Preference">
+      </page>
    </extension>
 
 </plugin>

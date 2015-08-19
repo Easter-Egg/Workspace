@@ -113,6 +113,7 @@ public class SelectSeriesForAxesDialog extends Dialog {
 		return new Point(220, 160);
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	protected void buttonPressed(int buttonId) {
 		super.buttonPressed(buttonId);
