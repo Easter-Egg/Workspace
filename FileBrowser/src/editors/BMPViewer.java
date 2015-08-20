@@ -1,35 +1,32 @@
 package editors;
 import java.io.File;
 import java.net.URI;
+import java.util.Random;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
-import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.EditorPart;
 
-public class ImageEditor extends EditorPart{
-	public static final String ID = "FileBrowser.ImageEditor";
+public class BMPViewer extends EditorPart{
+	public static final String ID = "FileBrowser.BMPViewer";
 	public ScrollBar hBar = null;
 	public ScrollBar vBar = null;
 	public Point origin = new Point (0, 0);
@@ -39,7 +36,7 @@ public class ImageEditor extends EditorPart{
 	@SuppressWarnings("unused")
 	private IWorkbenchPage page;
 	
-	public ImageEditor() {
+	public BMPViewer() {
 	}
 
 	@Override
@@ -70,26 +67,50 @@ public class ImageEditor extends EditorPart{
 
 	@Override
 	public void createPartControl(Composite parent) {
-		parent.setLayout(new GridLayout(1, false));
-		ToolBar toolbar = new ToolBar(parent, SWT.None);
-		toolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		ToolBarManager tm = new ToolBarManager(toolbar);
-		this.tm = tm;		
-		((IMenuService) getEditorSite().getService(IMenuService.class)).populateContributionManager(tm, "toolbar:FileBrowser.ImageEditor");
-		
 		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
+/*
 		IEditorInput editorInput = getEditorInput();
 		FileStoreEditorInput fsInput = (FileStoreEditorInput)editorInput;
 		URI uri = fsInput.getURI();
 		File file = new File(uri);
-		image = new Image(parent.getDisplay(), file.getAbsolutePath());
-		canvas = new Canvas(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.None);
-		canvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		image = new Image(parent.getDisplay(), file.getAbsolutePath());*/
 		
+		Random r = new Random();
+		int i = 0;
+		//float j = 0;
+		PaletteData palette = new PaletteData(0xFF, 0x00FF, 0x0000FF);
+		ImageData imageData = new ImageData(128, 64, 8, palette);
+		for(int x = 0 ; x < 128 ; x++){
+	        for(int y = 0 ; y < 64 ; y++){
+	        	i = r.nextInt(255);
+	        	//j = r.nextFloat() * r.nextInt(10);
+	            imageData.setPixel(x, y, i);
+	        }
+	    }
+		
+		image = new Image(parent.getDisplay(), imageData);
+		canvas = new Canvas(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.NONE);
 		hBar = canvas.getHorizontalBar();
-		
 		vBar = canvas.getVerticalBar();
+		
+		canvas.addListener (SWT.Paint, new Listener () {
+			@Override
+			public void handleEvent (Event e) {
+				GC gc = e.gc;
+				gc.drawImage (image, origin.x, origin.y);
+				canvas.setSize(128 + canvas.getVerticalBar().getSize().x, 64 + canvas.getHorizontalBar().getSize().y);
+				Rectangle rect = image.getBounds();
+				Rectangle client = canvas.getClientArea ();
+				int marginWidth = client.width - rect.width;
+				if (marginWidth > 0) {
+					gc.fillRectangle (rect.width, 0, marginWidth, client.height);
+				}
+				int marginHeight = client.height - rect.height;
+				if (marginHeight > 0) {
+					gc.fillRectangle (0, rect.height, client.width, marginHeight);
+				}
+			}
+		});
 		
 		canvas.addListener (SWT.Resize,  new Listener() {
 			@Override
@@ -123,24 +144,6 @@ public class ImageEditor extends EditorPart{
 			}
 		});
 		
-		canvas.addListener (SWT.Paint, new Listener () {
-			@Override
-			public void handleEvent (Event e) {
-				GC gc = e.gc;
-				gc.drawImage (image, origin.x, origin.y);
-				Rectangle rect = image.getBounds ();
-				Rectangle client = canvas.getClientArea ();
-				int marginWidth = client.width - rect.width;
-				if (marginWidth > 0) {
-					gc.fillRectangle (rect.width, 0, marginWidth, client.height);
-				}
-				int marginHeight = client.height - rect.height;
-				if (marginHeight > 0) {
-					gc.fillRectangle (0, rect.height, client.width, marginHeight);
-				}
-			}
-		});
-		
 		hBar.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
@@ -151,6 +154,7 @@ public class ImageEditor extends EditorPart{
 				origin.x = -hSel;
 			}
 		});
+		
 		vBar.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
@@ -161,27 +165,10 @@ public class ImageEditor extends EditorPart{
 				origin.y = -vSel;
 			}
 		});
-		/*
-		canvas.addFocusListener(new FocusListener(){
-			@Override
-			public void focusGained(FocusEvent e) {
-				TestOutlineView olv = (TestOutlineView) page.findView("FileBrowser.testOutlineView");
-				olv.getText().setText("File Name : " + file.getName() + "\nFile Size : " + file.length() + " Bytes");
-			}
-			@Override
-			public void focusLost(FocusEvent e) {
-			}
-		});*/
-		
-		MenuManager menuManager = new MenuManager();
-		Menu menu = menuManager.createContextMenu(canvas);
-		canvas.setMenu(menu);
-		getSite().registerContextMenu(menuManager, getSite().getSelectionProvider());
 	}
 	
 	@Override
 	public void dispose(){
-		((IMenuService) getEditorSite().getService(IMenuService.class)).releaseContributions(tm);
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
+import editors.BMPViewer;
 import editors.ImageEditor;
 import editors.MultiChartEditor;
 import editors.MyTextEditor;
@@ -71,6 +72,10 @@ public class FileOpenAction extends Action implements IWorkbenchAction {
 			
 			else if (file.getName().endsWith(".csv")){
 				page.openEditor(fileStoreEditorInput, MultiChartEditor.ID, false).setFocus();
+			}
+			
+			else if (file.getName().endsWith(".bmp")){
+				page.openEditor(fileStoreEditorInput, BMPViewer.ID, false).setFocus();
 			}
 			
 		} catch (PartInitException e) {

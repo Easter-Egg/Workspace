@@ -6,21 +6,15 @@ import java.net.URI;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-import utils.ChartCompositeWithKeyListener;
-
 public class MultiChartEditor extends MultiPageEditorPart{
 	public final static String ID = "FileBrowser.MultiChartEditor";
 	private ChartEditor firstChartEditor;
 	private File file;
-	private ChartCompositeWithKeyListener cc;
 	
 	@Override
 	public boolean isDirty() {
@@ -39,48 +33,48 @@ public class MultiChartEditor extends MultiPageEditorPart{
 		
 		try {
 			addPage(firstChartEditor, editorInput);
-			addPage(createChartPage());
-			//addPage(createChartPage());
-			//addPage(createChartPage());
+			addPage(new ChartEditor(), editorInput);
+			addPage(new ChartEditor(), editorInput);
+			addPage(new ChartEditor(), editorInput);
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
 		setPartName(file.getName());	
 		setPageText(0, file.getName());
 		setPageText(1, "Series 1");
-		//setPageText(2, "Series 2");
-		//setPageText(3, "Series 3");
+		setPageText(2, "Series 2");
+		setPageText(3, "Series 3");
 		
 		
 		addPageChangedListener(new IPageChangedListener() {
 			
 			@Override
 			public void pageChanged(PageChangedEvent event) {
-				// TODO Auto-generated method stub
 				
 				if(getActivePage() == 0){
 					System.out.println(getActivePage());
-					for(int i = 0 ; i <firstChartEditor.getXYGraph().getChart().getXYPlot().getSeriesCount() ; i++)
-						firstChartEditor.getXYGraph().getChart().getXYPlot().getRenderer().setSeriesVisible(i, true);
 				}
 				
 				else if(getActivePage() == 1){
 					System.out.println(getActivePage());
-					firstChartEditor.getXYGraph().getChart().getXYPlot().getRenderer().setSeriesVisible(1, false);
-			        firstChartEditor.getXYGraph().getChart().getXYPlot().getRenderer().setSeriesVisible(2, false);
-			        cc.setChart(firstChartEditor.getXYGraph().getChart());
+					((ChartEditor) getActiveEditor()).getXYGraph().getChart().getXYPlot().getRenderer().setSeriesVisible(1, false);
+					((ChartEditor) getActiveEditor()).getXYGraph().getChart().getXYPlot().getRenderer().setSeriesVisible(2, false);
+				}
+				
+				else if(getActivePage() == 2){
+					((ChartEditor) getActiveEditor()).getXYGraph().getChart().getXYPlot().getRenderer().setSeriesVisible(0, false);
+					((ChartEditor) getActiveEditor()).getXYGraph().getChart().getXYPlot().getRenderer().setSeriesVisible(2, false);
+				}
+				
+				else if(getActivePage() == 3){
+					((ChartEditor) getActiveEditor()).getXYGraph().getChart().getXYPlot().getRenderer().setSeriesVisible(0, false);
+					((ChartEditor) getActiveEditor()).getXYGraph().getChart().getXYPlot().getRenderer().setSeriesVisible(1, false);
 				}
 			}
 		});
 
 	}
 	
-	private Control createChartPage(){
-		cc = new ChartCompositeWithKeyListener(getContainer(), SWT.NONE, null, true);
-		cc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		return cc;
-	}
-
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		

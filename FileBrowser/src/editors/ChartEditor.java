@@ -265,7 +265,7 @@ public class ChartEditor extends EditorPart{
 	
 	@Override
 	public void createPartControl(Composite parent) {
-		long start = System.currentTimeMillis();
+		// long start = System.currentTimeMillis();
 		parent.setLayout(new GridLayout(1, false));
 		ToolBar toolbar = new ToolBar(parent, SWT.None);
 		toolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -298,9 +298,9 @@ public class ChartEditor extends EditorPart{
 		cc.setVerticalAxisTrace(true);
 		cc.addChartMouseListener(chartMouseListener);
 		// FastScatterPlotChart(parent); 스캐터 플랏 차트
-		long end = System.currentTimeMillis();
+		// long end = System.currentTimeMillis();
 		
-		System.out.println("createPartControl() 수행시간 : " + (end - start) + "ms");
+		// System.out.println("createPartControl() 수행시간 : " + (end - start) + "ms");
 	}
 
 	@Override
@@ -310,6 +310,10 @@ public class ChartEditor extends EditorPart{
 	
 	public ChartComposite getXYGraph(){
 		return cc;
+	}
+	
+	public void setXYGraph(ChartComposite cc){
+		this.cc = cc;
 	}
 	
 	@Override

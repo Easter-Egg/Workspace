@@ -73,6 +73,12 @@
             id="FileBrowser.MultiChartEditor"
             name="MultiChartEditor">
       </editor>
+      <editor
+            class="editors.BMPViewer"
+            default="false"
+            id="FileBrowser.BMPViewer"
+            name="BMPViewer">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -179,6 +185,16 @@
             id="FileBrowser.command.SelectSeries"
             name="Select Series">
       </command>
+      <command
+            defaultHandler="org.eclipse.ui.internal.handlers.SaveHandler"
+            id="FileBrowser.command.Save"
+            name="Save">
+      </command>
+      <command
+            defaultHandler="org.eclipse.ui.internal.handlers.SaveAllHandler"
+            id="FileBrowser.command.SaveAll"
+            name="Save All">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -227,6 +243,12 @@
                   label="About"
                   style="push">
             </command>
+            <command
+                  commandId="FileBrowser.command.SaveAll"
+                  icon="icons/folder_for_text.png"
+                  label="Save All"
+                  style="push">
+            </command>
          </toolbar>
       </menuContribution>
       <menuContribution
@@ -270,6 +292,12 @@
                commandId="FileBrowser.command.About"
                icon="icons/folder.png"
                label="About"
+               style="push">
+         </command>
+         <command
+               commandId="FileBrowser.command.Save"
+               icon="icons/save.png"
+               label="Save"
                style="push">
          </command>
       </menuContribution>
