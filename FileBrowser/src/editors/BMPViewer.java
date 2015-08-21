@@ -1,15 +1,12 @@
 package editors;
 import java.io.File;
 import java.net.URI;
-import java.util.Random;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
@@ -68,13 +65,13 @@ public class BMPViewer extends EditorPart{
 	@Override
 	public void createPartControl(Composite parent) {
 		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-/*
+
 		IEditorInput editorInput = getEditorInput();
 		FileStoreEditorInput fsInput = (FileStoreEditorInput)editorInput;
 		URI uri = fsInput.getURI();
 		File file = new File(uri);
-		image = new Image(parent.getDisplay(), file.getAbsolutePath());*/
-		
+		image = new Image(parent.getDisplay(), file.getAbsolutePath());
+		/*
 		Random r = new Random();
 		int i = 0;
 		//float j = 0;
@@ -86,9 +83,9 @@ public class BMPViewer extends EditorPart{
 	        	//j = r.nextFloat() * r.nextInt(10);
 	            imageData.setPixel(x, y, i);
 	        }
-	    }
+	    }*/
 		
-		image = new Image(parent.getDisplay(), imageData);
+		//image = new Image(parent.getDisplay(), imageData);
 		canvas = new Canvas(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.NONE);
 		hBar = canvas.getHorizontalBar();
 		vBar = canvas.getVerticalBar();
@@ -140,7 +137,7 @@ public class BMPViewer extends EditorPart{
 					origin.y = -vSel;
 				}
 				
-				canvas.redraw ();
+				canvas.redraw();
 			}
 		});
 		

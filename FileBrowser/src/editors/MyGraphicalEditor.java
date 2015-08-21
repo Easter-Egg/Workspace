@@ -25,12 +25,15 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -75,7 +78,11 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 	private GraphNode root;
 	
 	private List<FileModel> fileModelList;	
-
+	
+	public ScrollBar hBar = null;
+	public ScrollBar vBar = null;
+	public Point origin = new Point (0, 0);
+	
 	public MyGraphicalEditor() {
 		setEditDomain(new DefaultEditDomain(this));
 	}
@@ -127,8 +134,76 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 		graph = new Graph(parent, SWT.NONE);
 		graph.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
+		hBar = graph.getHorizontalBar();
+		vBar = graph.getVerticalBar();
 		
-		graph.addListener(SWT.Resize, new Listener() {
+		graph.addListener (SWT.Resize,  new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				Rectangle rect = graph.getBounds();
+				Rectangle client = graph.getClientArea();
+				
+				hBar.setMaximum (rect.width);
+				vBar.setMaximum (rect.height);
+				hBar.setThumb (Math.min(rect.width, client.width));
+				vBar.setThumb (Math.min(rect.height, client.height));
+				
+				int hPage = rect.width - client.width;
+				int vPage = rect.height - client.height;
+				int hSel = hBar.getSelection();
+				int vSel = vBar.getSelection();
+				
+				if (hSel >= hPage){
+					if (hPage <= 0) 
+						hSel = 0;
+					origin.x = -hSel;
+				}
+				
+				if (vSel >= vPage){
+					if (vPage <= 0) 
+						vSel = 0;
+					origin.y = -vSel;
+				}
+				
+				graph.redraw ();
+			}
+		});
+		//graph.setSize(1280, 720);
+		
+		graph.addListener(SWT.Paint, new Listener(){
+
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				graph.setSize(1280, 720);
+				graph.setHorizontalScrollBarVisibility(2);
+				graph.setVerticalScrollBarVisibility(2);
+			}
+			
+		});
+		
+		hBar.addListener(SWT.Selection, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				int hSel = hBar.getSelection();
+				int destX = -hSel - origin.x;
+				Rectangle rect = graph.getBounds();
+				graph.scroll(destX, 0, 0, 0, rect.width, rect.height, false);
+				origin.x = -hSel;
+			}
+		});
+		vBar.addListener(SWT.Selection, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				int vSel = vBar.getSelection();
+				int destY = -vSel - origin.y;
+				Rectangle rect = graph.getBounds();
+				graph.scroll(0, destY, 0, 0, rect.width, rect.height, false);
+				origin.y = -vSel;
+			}
+		});
+		
+		/*graph.addListener(SWT.Resize, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				if (graph.getLayoutAlgorithm().getClass().equals(HorizontalTreeLayoutAlgorithm.class)) {
@@ -141,7 +216,7 @@ public class MyGraphicalEditor extends GraphicalEditorWithPalette{
 					graph.setLayoutAlgorithm(new GridLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 				}
 			}
-		});	
+		});	*/
 		graph.addMouseWheelListener( new MouseWheelListener() {
 			@Override
 			public void mouseScrolled(org.eclipse.swt.events.MouseEvent e) {
