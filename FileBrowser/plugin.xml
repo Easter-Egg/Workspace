@@ -39,6 +39,17 @@
             name="Outline"
             restorable="true">
       </view>
+      <category
+      		id= "FileBrowser.ProjectExplorer.category"
+      		name="Common navigator Examples"/>
+      <view
+            allowMultiple="false"
+            category="FileBrowser.ProjectExplorer.category"
+            class="org.eclipse.ui.navigator.CommonNavigator"
+            icon="icons/filenav_nav.gif"
+            id="FileBrowser.ProjectExplorer"
+            name="Project Explorer">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -194,6 +205,10 @@
             defaultHandler="org.eclipse.ui.internal.handlers.SaveAllHandler"
             id="FileBrowser.command.SaveAll"
             name="Save All">
+      </command>
+      <command
+            id="FileBrowser.command3"
+            name="name">
       </command>
    </extension>
    <extension
@@ -446,6 +461,101 @@
             id="FileBrowser.page.CustomPreferencePage"
             name="Custom Preference">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewer
+            viewerId="FileBrowser.ProjectExplorer">
+         <popupMenu>
+            <insertionPoint
+                  name="group.new"
+                  separator="true" />
+          	<insertionPoint
+                  name="group.goto"/>
+           	<insertionPoint
+                  name="group.open"
+                  separator="true" />
+          	<insertionPoint
+                  name="group.openWith" />
+          	<insertionPoint
+                  name="group.edit"
+                  separator="true" />
+          	<insertionPoint
+                  name="group.show"
+                  separator="true" />
+          	<insertionPoint
+                  name="group.reorganize" />
+          	<insertionPoint
+                  name="group.port" />
+          	<insertionPoint
+                  name="group.generate"
+                  separator="true" />
+          	<insertionPoint
+                  name="group.search"
+                  separator="true" />
+          	<insertionPoint
+                  name="group.build"
+                  separator="true" />
+          	<insertionPoint
+                  name="additions"
+                  separator="true" />
+          	<insertionPoint
+                  name="group.properties"
+                  separator="true" />
+         </popupMenu>
+      </viewer>
+      <viewerContentBinding
+            viewerId="FileBrowser.ProjectExplorer">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resourceContent">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.*">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+      <viewerActionBinding
+            viewerId="FileBrowser.ProjectExplorer">
+         <includes>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.*">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            contentProvider="utils.PropertiesContentProvider"
+            icon="icons/prop_ps.gif"
+            id="FileBrowser.navigatorContent"
+            labelProvider="utils.PropertiesLabelProvider"
+            name="Navigator Content"
+            priority="normal">
+         <triggerPoints>
+            <or>
+               <and>
+               <instanceof value="org.eclipse.core.resources.IResource"/>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.extension"
+                        value="properties">
+                  </test>
+               </and>
+               <instanceof
+  					value="utils.PropertiesTreeData">
+  				</instanceof>
+			</or>
+		</triggerPoints>
+         <possibleChildren>
+            <or>
+               <instanceof
+                     value="utils.PropertiesTreeData">
+               </instanceof>
+            </or>
+         </possibleChildren>
+      </navigatorContent>
    </extension>
 
 </plugin>

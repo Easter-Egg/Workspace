@@ -9,6 +9,7 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.eclipse.ui.navigator.resources.ProjectExplorer;
 
 import views.BrowserView;
 import views.PathView;
@@ -18,12 +19,11 @@ public class Perspective implements IPerspectiveFactory {
 
 	public void createInitialLayout(IPageLayout layout) {
 		layout.setFixed(true);
-		layout.addStandaloneView(BrowserView.ID, true, IPageLayout.LEFT, 0.2f, IPageLayout.ID_EDITOR_AREA);
+		layout.addStandaloneView(ProjectExplorer.VIEW_ID, true, IPageLayout.LEFT, 0.2f, IPageLayout.ID_EDITOR_AREA);
 		layout.addStandaloneView(PathView.ID, false, IPageLayout.TOP, 0.03f, BrowserView.ID);
 		setConsole();
 		layout.addStandaloneView(IConsoleConstants.ID_CONSOLE_VIEW, true, IPageLayout.BOTTOM, 0.8f,IPageLayout.ID_EDITOR_AREA);
 		layout.addView(TestOutlineView.ID, IPageLayout.RIGHT, 0.8f, IPageLayout.ID_EDITOR_AREA);
-		//layout.addView(IPageLayout.ID_PROP_SHEET, IPageLayout.BOTTOM, 0.5f, TestOutlineView.ID);
 	}
 	
 	public void setConsole(){
